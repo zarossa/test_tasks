@@ -9,7 +9,8 @@ def str_to_int(stack):
 
 
 def find_max(stack_1, stack_2, salary):
-    # 1. Собрать максимальную сумму из первой стопки (запомнить длину строки и сравнять с макс)
+    # Возвращает максимальную стопку подходящих резюме
+    # 1. Собрать максимальную сумму из первой стопки
     stack_confirm = []  # рассматриваемая стопка (плавно скользит между первой и второй стопками)
     for num in stack_1:  # наполнение стопки из первой папки
         if sum(stack_confirm) > salary:
@@ -20,9 +21,7 @@ def find_max(stack_1, stack_2, salary):
     resume_number_max = len(stack_confirm)  # максимальное число резюме
     stack_confirm.insert(0, 0)  # добавление символа-разделителя
 
-    # 2. Добавить новый элемент из второй стопки (добавить в длину и обновить макс значение),
-    # если не влезло и есть элементы из первой стопки(элемент "0")-выкинуть последний элемент(убрать из длины)
-    # повторить заново 2
+    # 2. Добавить новый элемент из второй стопки
     for num in stack_2:
         stack_confirm.insert(0, num)
         while sum(stack_confirm) > salary:
@@ -34,7 +33,7 @@ def find_max(stack_1, stack_2, salary):
             resume_number_max = max(resume_number_max, len(stack_confirm) - 1)
 
     # 3. Вернуть максимальное значение
-    return resume_number_max, stack_confirm
+    return resume_number_max
 
 
 # 1. Подготовка и считывание данных
@@ -51,9 +50,6 @@ stack2 = str_to_int(stack2)  # конвертация второй стопки 
 # 2. Анализ
 
 # testing data
-# stack1 = [5, 2, 2, 1, 1, 2, 1, 1, 5]
-# stack2 = [1, 1, 1, 3, 3]
-# salaries = 13
 resume_num = find_max(stack1, stack2, salaries)  # поиск наибольшего количества резюме
 
 # 3. Вывод результата
