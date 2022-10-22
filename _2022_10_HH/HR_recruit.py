@@ -13,11 +13,11 @@ def find_max(stack_1, stack_2, salary):
     # 1. Собрать максимальную сумму из первой стопки
     stack_confirm = []  # рассматриваемая стопка (плавно скользит между первой и второй стопками)
     for num in stack_1:  # наполнение стопки из первой папки
+        stack_confirm.append(num)
         if sum(stack_confirm) > salary:
             # выйти, если превысили значение зарплаты
             del stack_confirm[-1]
             break
-        stack_confirm.append(num)
     resume_number_max = len(stack_confirm)  # максимальное число резюме
     stack_confirm.insert(0, 0)  # добавление символа-разделителя
 
