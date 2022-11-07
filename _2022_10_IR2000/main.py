@@ -18,7 +18,7 @@ import zipfile
 
 import data  # импорт функций
 # import download
-import parser
+import parser_xml
 import sql
 import ftp
 
@@ -36,6 +36,7 @@ chank_size = 500  # Размера чанка
 try:
     # Перебор регионов
     for region in data.all_regions:
+        # region = '13'
         region_name = data.regions(region)  # Получаем название региона по его индексу
         arch_start = 1
 
@@ -55,15 +56,20 @@ try:
             file_list_curr = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/currMonth')
             file_list_prev = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/prevMonth')
             file_list = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts')
+            # file_list = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/currMonth')
 
-            for file in file_list_curr:
-                file = 'currMonth/' + file
+            # for file in file_list_curr:
+            #     file = 'currMonth/' + file
+            # for file in file_list:
+            #     file = 'currMonth/' + file
+            for file in range(len(file_list_curr)):
+                file_list_curr[file] = 'currMonth/' + file_list[file]
 
-            for file in file_list_prev:
-                if file in file_list:
-                    del file
+            for file in range(len(file_list_prev)):
+                if file_list_prev[file] in file_list:
+                    del file_list_prev[file]
                 else:
-                    file = 'prevMonth/' + file
+                    file_list_prev[file] = 'prevMonth/' + file_list_prev[file]
 
             file_list.remove('currMonth')
             file_list.remove('prevMonth')
@@ -80,7 +86,7 @@ try:
                         'control99doc_', '').replace(region_name + '_', '').split('_')[0][:4])
                 if year != 2022:
                     if console_debug == 1:
-                        print('Download archives ' + str(round(arch_start * 100 / len(file_list))) + '%', end='\r')
+                        print(f'Download archives {str(round(arch_start * 100 / len(file_list)))}%', end='\n')
 
                     arch_start = arch_start + 1
                     continue
@@ -90,11 +96,10 @@ try:
                 tmp_files.append(file_zip)
 
                 if console_debug == 1:
-                    print('Download archives ' + str(round(arch_start * 100 / len(file_list))) + '%', end='\r')
+                    print(f'Download archives {str(round(arch_start * 100 / len(file_list)))}%', end='\n')
 
-                arch_start = arch_start + 1
-            # Закрываем соединение
-            ftp_connect.close()
+                arch_start += 1
+            ftp_connect.close()  # Закрываем соединение
         else:
             print(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"), 'Не удалось установить связь с FTP-сервером')
             continue
@@ -110,7 +115,7 @@ try:
         error_files = 0
 
         # Перебор архивов
-        for tmp_file in tmp_files:
+        for idx, tmp_file in enumerate(tmp_files):
             # Пропуск нечитаемого/несуществующего файла (с этим возникали какие-то проблемы,
             # парсер ссылался на несуществующий файл, видимо где-то были дубли)
             try:
@@ -120,7 +125,7 @@ try:
                 all_files += len(file_zip_open.namelist())
 
                 # Перебор файлов в архиве
-                for file in file_zip_open.namelist():
+                for index, file in enumerate(file_zip_open.namelist()):
                     # Отсеиваем лишние файлы
                     if 'Procedure' in file or 'sig' in file or 'Available' in file or 'contract' not in file \
                             or 'Cancel' in file:
@@ -130,22 +135,18 @@ try:
                     true_files += 1
 
                     try:
-                        # Получаем содержимоее файла в байтовом виде и отправляем в парсер на обработку
-                        oneObject = parser.read_xml(file_zip_open.read(file))
-
+                        # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
+                        oneObject = parser_xml.read_xml(file_zip_open.read(file))
                         oneObjectID = list(oneObject.keys())[0]
-
                         if oneObjectID not in data_contracts:
                             data_contracts.append(oneObjectID)
                             all_data.update(oneObject)
                         elif oneObject[oneObjectID]['publishDate'] >= all_data[oneObjectID]['publishDate']:
                             all_data[oneObjectID] = oneObject[oneObjectID]
-
                         if console_debug == 1:
                             print('Parsing xml ' + str(round(
                                 xml_start * (arch_start * 100 / len(tmp_files)) / len(file_zip_open.namelist()))) + '%',
-                                  end='\r')
-
+                                  end='\n')
                         xml_start = xml_start + 1
 
                         chank += 1
@@ -155,10 +156,12 @@ try:
                             all_data = {}
                             chank = 0
                     except Exception as er:
+                        print(er)
                         error_files = error_files + 1
                         continue
+                file_zip_open.close()
             except Exception as ex:
-                print('Archive error')
+                print(f'Archive error\n{ex}')
                 continue
 
         if console_debug == 1:
@@ -171,8 +174,8 @@ try:
         chank = 0
 
         # Получаем список файлов временной папки и удаляем их
-        for file in os.listdir('/home/parser/contracts/tmp'):
-            os.remove('/home/parser/contracts/tmp/' + file)
+        for file in os.listdir('tmp'):
+            os.remove('tmp/' + file)
 
         print(f'All: {all_files} status: {all_files == true_files + false_files} True: {true_files} '
               f'False: {false_files}')

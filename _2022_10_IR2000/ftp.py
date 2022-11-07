@@ -29,12 +29,12 @@ def ftp_download(ftp, file):
     :param ftp: FTP-соединение
     :param file: Путь до файла, относительно текущей директории (устонавливается перед запуском функции)
     :return: Возвращает путь до файла во временной папке"""
-    path_tmp = '/home/parser/contracts/tmp/'  # Расположение временой папки
+    # path_tmp = '/home/parser/contracts/tmp/'  # Расположение временной папки
+    path_tmp = 'tmp/'  # Расположение временой папки
 
     # Дописываем в путь дополнительные префиксы при наличии вложенных папок
     if 'currMonth/' in file or 'prevMonth/' in file:
         file = file.split('/')[1]
-
     # Сохраняем файл на сервере
     with open(path_tmp + file, "wb") as f:
         ftp.retrbinary("RETR " + file, f.write)

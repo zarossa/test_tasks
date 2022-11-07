@@ -3,8 +3,12 @@ from mysql.connector import Error
 import re
 
 fieldsLinks = {
-    'id'													: 'id','publishDate'												: 'publishDate','customerregNum'											: 'customerregNum','customerconsRegistryNum'									: 'customerconsRegistryNum',
-    'customerfullName'											: 'customerfullName','customershortName'											: 'customershortName',
+    'id'													: 'id',
+    'publishDate'												: 'publishDate',
+    'customerregNum'											: 'customerregNum',
+    'customerconsRegistryNum'									: 'customerconsRegistryNum',
+    'customerfullName'											: 'customerfullName',
+    'customershortName'											: 'customershortName',
     'customerregistrationDate'									: 'customerDate',
     'customerinn'												:'customerinn',
     'customerkpp'												:'customerkpp',
@@ -13,25 +17,29 @@ fieldsLinks = {
     'cu'												: 'customerOKPO',
     'curCode'										: 'custode',
     'regNum'													: 'regNum',
-    'number'													: 'number','contractSubject'											:'contractSubject',
+    'number'													: 'number',
+    'contractSubject'											:'contractSubject',
     'href'														: 'href',
     'printFormurl'												: 'printFormurl',
     'printFormdocRegNumber'										: 'printFoumber',
-    'productsproductsid'										: 'productsid','productsproductOKPD2code'									: 'produce',
+    'productsproductsid'										: 'productsid',
+    'productsproductOKPD2code'									: 'produce',
     'productsproductOKPD2name'									: 'pPD2name',
     'productsproductname'										: 'productsname',
     'productsproductOKEIcode'									: 'productsOKEIcode',
     'productOKEInationalCode'							: 'productsOKEInationalCode',
     'productsproductOKEIfullName'								: 'produclName',
     'productsproductprice'										: 'productsprice',
-    'productsproductpriceRUR'									: 'productspriceRUR','productsproductwhitoutVATPrice'							: 'produVATPrice',
+    'productsproductpriceRUR'									: 'productspriceRUR',
+    'productsproductwhitoutVATPrice'							: 'produVATPrice',
     'productsproductquantity'									:'productsquantity',
     'productsproductsum'										:'productssum',
     'productsproductsumRUR'										:'productssumRUR',
     'productsproductwithoutVATSum'								: 'productswithoutVATSum',
     'productsproductVATRate'									: 'productsVATRate',
     'productsproductVATSum'										: 'productsVATSum',
-    'prosproductoriginCountrycountryCode'					: 'productsoriginCountrycountryCode','productsproductoriginCountrycountryFullName'				:'productsoriginCountrycountryFullName',
+    'prosproductoriginCountrycountryCode'					: 'productsoriginCountrycountryCode',
+    'productsproductoriginCountrycountryFullName'				:'productsoriginCountrycountryFullName',
     'productsTRUcode'									: 'productsKTRUcode',
     'productsproductKTRUname'									: 'productsKTRUname',
     'productsproductKTRUOKPD2code'								: 'productsKTRUOKPD2code',
@@ -245,6 +253,7 @@ def db_connect():
         'password': 'root',
         'host': 'localhost',
         'port': '3306',
+        'database': 'contracts',
         'raise_on_warnings': True
     }
     return mysql.connect(**config)
@@ -256,7 +265,7 @@ def get_columns(table):
     :return: Список столбцов"""
     try:
         connection = db_connect()
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             query = f"SHOW COLUMNS FROM {table}"
             cursor.execute(query)
             columns = cursor.fetchall()
@@ -264,7 +273,7 @@ def get_columns(table):
         result = [column[0] for column in columns]
         return result
     except Error as e:
-        print(f'The error {e} was occurred')
+        print(f'The error was occurred at the function get_columns:\n{e}')
 
 
 def get_contracts_numbers(table):
@@ -273,8 +282,8 @@ def get_contracts_numbers(table):
     :return: Список контрактов"""
     try:
         connection = db_connect()
-        with connection.cursor as cursor:
-            query = f"SELECT `nn`.`regNum`, `nn`.`publishDate` FROM `{table}` AS `nn`"
+        with connection.cursor() as cursor:
+            query = f"SELECT regNum, publishDate FROM {table}"
             cursor.execute(query)
             ids = cursor.fetchall()
         connection.close()
@@ -282,8 +291,8 @@ def get_contracts_numbers(table):
         for i in ids:
             result[i[0]] = {'regNum': i[0], 'publishDate': i[1]}
         return result
-    except Error as e:
-        print(f'The error {e} was occurred')
+    except Exception as e:
+        print(f'The error was occurred at the function get_contracts_numbers:\n{e}')
 
 
 def get_suppliers_info(table, region):
@@ -309,7 +318,7 @@ FROM
 WHERE 
   `t`.`region` = '{region}' 
   AND `t`.`suppliersINN` IS NOT NULL"""
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(query)
             contracts = cursor.fetchall()
         connection.close()
@@ -344,7 +353,7 @@ WHERE
                 k += 1
         return result
     except Error as e:
-        print(f'The error {e} was occurred')
+        print(f'The error was occurred at the function get_suppliers_info:\n{e}')
 
 
 def create_columns(columns):
@@ -353,7 +362,7 @@ def create_columns(columns):
     try:
         connection = db_connect()
         columns = ', '.join(columns)
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             query = "ALTER TABLE `northwestern_fd` " + columns
             cursor.execute(query)
             query = "ALTER TABLE `central_fd` " + columns
@@ -378,7 +387,7 @@ def create_columns(columns):
         connection.close()
         return True
     except Error as e:
-        print(f'The error {e} was occurred')
+        print(f'The error was occurred at the function create_columns:\n{e}')
 
 
 def update_values(table, columns, values):
@@ -389,17 +398,18 @@ def update_values(table, columns, values):
     try:
         connection = db_connect()
         columns = columns[3:]
-        columns = [f"`{column}` = IFNULL(%s, DEFAULT(`{column}`))" for column in columns]
+        columns = [f"{column} = IFNULL(%s, DEFAULT({column}))" for column in columns]
         sets = ', '.join(columns)
-        values = (tuple(list(value)[1:-1] + [value[0]]) for value in values)
-        query = f"UPDATE `{table}` SET {sets} WHERE `regNum` = %s"
-        with connection.cursor as cursor:
+        for idx, value in enumerate(values):
+            values[idx] = tuple(list(value)[1:-1] + [value[0]])
+        query = f"UPDATE {table} SET {sets} WHERE regNum = %s"
+        with connection.cursor() as cursor:
             cursor.executemany(query, values)
             connection.commit()
         connection.close()
         return True
     except Error as e:
-        print(f'The error {e} was occurred')
+        print(f'The error was occurred at the function update_values:\n{e}')
 
 
 def insert_values(table, columns, values):
@@ -410,15 +420,15 @@ def insert_values(table, columns, values):
     try:
         connection = db_connect()
         val = re.sub(r'\$s', '%s', ', '.join(['IFNULL($s, DEFAULT(`%s`))'] * len(columns)) % tuple(columns))
-        columns = '`, `'.join(columns)
-        query = f"INSERT INTO `{table}` (`{columns}`) VALUES ({val})"
-        with connection.cursor as cursor:
-            cursor.executemane(query, values)
+        columns = ', '.join(columns)
+        query = f"INSERT INTO {table} ({columns}) VALUES ({val})"
+        with connection.cursor() as cursor:
+            cursor.executemany(query, values)
             connection.commit()
         connection.close()
         return True
     except Error as e:
-        print(f'The error {e} was occurred')
+        print(f'The error was occurred at the function insert_values:\n{e}')
 
 
 def parse_for_update(columns, values):
@@ -437,7 +447,6 @@ def parse_sql(data, region):
     preval = {}
     values = []
     updates = []
-
     # В зависимости от региона, получаем таблицу для записи
     if region in ['78', '47', '53', '60', '10', '29', '11', '35', '51', '83', '39']:
         table_name = 'northwestern_fd'
@@ -462,7 +471,6 @@ def parse_sql(data, region):
 
     contract_numbers = get_contracts_numbers(table_name)
     table_columns = get_columns(table_name)
-
     # Формируем столбцы для добавления в БД
     # !!!Внимание!!! Проверка столбцов чувствительна к регистру. EndDate не равно endDate.
     for notif in data:
@@ -471,11 +479,10 @@ def parse_sql(data, region):
             if column in fieldsLinks:
                 col = fieldsLinks[column]
                 if col not in table_columns:
-                    columns_to_add.append('ADD `' + col + '` mediumtext')
+                    columns_to_add.append(f'ADD {col} mediumtext')
                     table_columns.append(col)
                 value[col] = data[notif][column]
         preval[notif] = value
-
     # Если есть новые столбцы, то добавляем их в БД
     if len(columns_to_add) > 0:
         create_columns(columns_to_add)
@@ -510,10 +517,10 @@ def parse_sql(data, region):
     # Обновление сущестыующих записей в БД
     # разкоментировать, чтобы записи обнавлялись, иначе будет пропускать
     if len(updates) > 0:
-        res_upt = update_values(table_name, table_columns, updates)
+        update_values(table_name, table_columns, updates)
 
     # Добавление новых записей в БД
     if len(values) > 0:
-        res_ins = insert_values(table_name, table_columns, values)
+        insert_values(table_name, table_columns, values)
 
-    print(len(data), len(values), len(updates))
+    # print(len(data), len(values), len(updates))
