@@ -27,7 +27,7 @@ import ftp
 1 - отображается подробная информация
 Для работы из консоли можно включить 1, но если в консоли работы не проводятся, то включаем 0, иначе логфайл захламится 
 инфой из циклов, так как вывод инфы в файл не понимает возврат коретки (\r)"""
-console_debug = 1
+console_debug = 0
 
 all_data = {}  # Массив для записи данных
 data_contracts = []  # Массив для глобального хранения ID извещений
@@ -36,7 +36,7 @@ chank_size = 500  # Размера чанка
 try:
     # Перебор регионов
     for region in data.all_regions:
-        # region = '13'
+        region = '79'
         region_name = data.regions(region)  # Получаем название региона по его индексу
         arch_start = 1
 
@@ -56,14 +56,9 @@ try:
             file_list_curr = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/currMonth')
             file_list_prev = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/prevMonth')
             file_list = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts')
-            # file_list = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts/currMonth')
 
-            # for file in file_list_curr:
-            #     file = 'currMonth/' + file
-            # for file in file_list:
-            #     file = 'currMonth/' + file
             for file in range(len(file_list_curr)):
-                file_list_curr[file] = 'currMonth/' + file_list[file]
+                file_list_curr[file] = 'currMonth/' + file_list_curr[file]
 
             for file in range(len(file_list_prev)):
                 if file_list_prev[file] in file_list:
@@ -77,10 +72,9 @@ try:
             file_list += file_list_curr + file_list_prev
             del file_list_prev
             del file_list_curr
-
+            print(f'Download data from {region} region')
             for file in file_list:
                 # Пропускаем все архивы, кроме 2021 года и более
-                # if '_2021' not in fileName and '_2022' not in fileName:
                 year = int(
                     file.replace('prevMonth/', '').replace('currMonth/', '').replace('contract_', '').replace(
                         'control99doc_', '').replace(region_name + '_', '').split('_')[0][:4])
@@ -156,7 +150,7 @@ try:
                             all_data = {}
                             chank = 0
                     except Exception as er:
-                        print(er)
+                        print(f'Something wrong.\n Error: {er}')
                         error_files = error_files + 1
                         continue
                 file_zip_open.close()
