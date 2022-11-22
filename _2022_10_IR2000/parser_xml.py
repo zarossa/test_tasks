@@ -61,18 +61,18 @@ def parse_xml(xml_object):
     :return: Возвращает результат перебора"""
     try:
         result = {}  # Переменная для записи результата перебора
-        file_id = xml_object['regNum']  # Получаем id файла и создаем массив для него
+        file_id = xml_object['id']  # Получаем id файла и создаем массив для него
         result[file_id] = {}
-
         # Перебор элементов объекта и запись в массив
         for child in xml_object:
             if isinstance(xml_object[child], str):  # Если дочерний элемент - строка, то делаем запись без обработки
                 result[file_id][child] = xml_object[child]
+
             else:  # Если дочерний элемент - это не строка, то делаем обработку перед записью
-                res = get_field(xml_object[child], child)  # Вызываем рекурсивную функцию для перебора дочерних элементов
+                res = get_field(xml_object[child], child)  # Вызываем рекурсивную функцию для перебора дочерних эл-тов
                 result[file_id].update(res)  # Результат добавляем в основной массив
         return result
-    except Exception:
+    except Exception as ex:
         pass
 
 
@@ -85,7 +85,6 @@ def get_field(parent_element, parent_name='', parent_type=False):
     """
     result = {}  # Переменная для записи результата перебора
 
-    # Перебираем родительский элемент суммируя имя элемента с дочерними именами
     for elem in parent_element:
         if parent_type:
             if isinstance(parent_element[elem], str):
@@ -109,6 +108,7 @@ def get_field(parent_element, parent_name='', parent_type=False):
             # Если текущий элемент - это строка, то делаем запись в переменную
             result[parent_name + elem] = parent_element[elem]
         elif isinstance(parent_element[elem], list):
+
             for el in parent_element[elem]:
                 res = get_field(el, '', True)
 
@@ -118,12 +118,12 @@ def get_field(parent_element, parent_name='', parent_type=False):
                         result[e_key] = res[r]
                     else:
                         result[e_key] += ';:;' + res[r]
+
         else:
             # Если текущий элемент - это не строка и не список, то вызываем рекурсию, передавая в нее дочерний элемент
             res = get_field(parent_element[elem], parent_name + elem)
             for r in res:
                 result[r] = res[r]  # Результат рекурсии записываем в переменную
-
     return result
 
 

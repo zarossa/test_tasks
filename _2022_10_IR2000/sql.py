@@ -1,495 +1,13 @@
 import mysql.connector as mysql
 from mysql.connector import Error
 import re
+from data import field_links
+from data import columns as table_columns
+from data import config
 
-# fieldsLinks = {
-#     'id'													: 'id',
-#     'publishDate'												: 'publishDate',
-#     'customerregNum'											: 'customerregNum',
-#     'customerconsRegistryNum'									: 'customerconsRegistryNum',
-#     'customerfullName'											: 'customerfullName',
-#     'customershortName'											: 'customershortName',
-#     'customerregistrationDate'									: 'customerDate',
-#     'customerinn'												:'customerinn',
-#     'customerkpp'												:'customerkpp',
-#     'customerlegalFormcode'										: 'cusalFormcode',
-#     'customerlegalFormsingularName'								:'customerlegalFormsingularName',
-#     'cu'												: 'customerOKPO',
-#     'curCode'										: 'custode',
-#     'regNum'													: 'regNum',
-#     'number'													: 'number',
-#     'contractSubject'											:'contractSubject',
-#     'href'														: 'href',
-#     'printFormurl'												: 'printFormurl',
-#     'printFormdocRegNumber'										: 'printFoumber',
-#     'productsproductsid'										: 'productsid',
-#     'productsproductOKPD2code'									: 'produce',
-#     'productsproductOKPD2name'									: 'pPD2name',
-#     'productsproductname'										: 'productsname',
-#     'productsproductOKEIcode'									: 'productsOKEIcode',
-#     'productOKEInationalCode'							: 'productsOKEInationalCode',
-#     'productsproductOKEIfullName'								: 'produclName',
-#     'productsproductprice'										: 'productsprice',
-#     'productsproductpriceRUR'									: 'productspriceRUR',
-#     'productsproductwhitoutVATPrice'							: 'produVATPrice',
-#     'productsproductquantity'									:'productsquantity',
-#     'productsproductsum'										:'productssum',
-#     'productsproductsumRUR'										:'productssumRUR',
-#     'productsproductwithoutVATSum'								: 'productswithoutVATSum',
-#     'productsproductVATRate'									: 'productsVATRate',
-#     'productsproductVATSum'										: 'productsVATSum',
-#     'prosproductoriginCountrycountryCode'					: 'productsoriginCountrycountryCode',
-#     'productsproductoriginCountrycountryFullName'				:'productsoriginCountrycountryFullName',
-#     'productsTRUcode'									: 'productsKTRUcode',
-#     'productsproductKTRUname'									: 'productsKTRUname',
-#     'productsproductKTRUOKPD2code'								: 'productsKTRUOKPD2code',
-#     'productsproductKTRUOKPD2name'								: 'productsKTRUOKPD2name',
-#     'productsproductMNInfoMNNName'								: 'productsMNNInfoMNNName',
-#     'productsproduurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfoMNNName'	: 'productsMNNInfoMNNName',
-#     'productsproductdosageUserOKEIcode'							: 'roductsdosageUserOKEIcode',
-#     'productsproductdrugPurchaseObjectInfodUsingReferenceInfoMNNsInfoMNNInfodosageUserdosageUserOKEIcode'	: 'productsdosageUserOKEIcode',
-#     'productsproductdosageUserOKEIname'							: 'roductsdosageUserOKEIname',
-#     'productsproductdrugPurchaseObjectInfodrugInfgReferenceInfoMNNsInfoMNNInfodosageUserdosageUserOKEIname'	: 'productsdosageUserOKEIname',
-#     'productsproductdosageUserdosageUserName'					: 'prductsdosageUserdosageUserName',
-#     'productsproductdrugPurchaseObjectInfodruingReferenceInfoMNNsInfoMNNInfodosageUserdosageUserName'	: 'productsdosageUserdosageUserName',
-#     'productsproducttradeInfotradeName'							: 'productstradeInfotradeNam',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfoptionsTradeNamepositionTradeNametradeInfotradeName'	: 'productstradeInfotradeName',
-#     'productsproductpositionTradeNamecertificateNumber'			: 'productspositionTradeNamecertificateNumbr',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNameposiionTradeNamecertificateNumber'	: 'productspositionTradeNamecertificateNumber',
-#     'productsproductmedicamentalFormInfomedicamentalFormName'	: 'productsmedicamentalFormInfomedicamentalFormName',
-#     'productsprodutdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNamemedtalFormInfomedicamentalFormName'	: 'productsproductmedicamentalFormInfomedicamentalFormName',
-#     'productsproductdosageInfodosageName'						: 'productsdosageInfodosageName',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNInfopositionsTradeNamepositionTradeNamedosageInfodosageName'	: 'productsdosageInfodosageName',
-#     'productsproductdosageOKEIcode'								: 'productsdosageOKEIcode',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInnfopositionsTradeNamepositionTradeNamedosageInfodosageOKEIcode'	: 'productsdosageOKEIcode',
-#     'productsproductdosageOKEInationalCode'						: 'productsdosageOKEInationalCode',
-#     'produtsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfnsTradeNamepositionTradeNamedosageInfodosageOKEInationalCode'	: 'produageOKEInationalCode',
-#     'productsproductdosageOKEIname'								: 'productsdosageOKEIname',
-#     'productsproductdosageInfodosageValue'						: 'productsdosageInfodosageValue',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNIsitionsTradeNamepositionTradeNamedosageInfodosageValue'	: 'productsdosageInfodosageValue',
-#     'productsproductdosageInfodosageUserName'					: 'productsdosageInfodosageUserName',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamositionTradeNamedosageInfodosageUserName'	: 'productsdosageInfodosageUserName',
-#     'productsproductpositionTradeNamecertificateKeeperName'		: 'productspositionTradeNamecertificateKeeperName',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamitionTradeNamecertificateKeeperName'	: 'productspositionTradeNamecertificateKeeperName',
-#     'productsproductmanufacturerOKSMcountryCode'				: 'productsmanufacturerOKSMcountryCode',
-#     'productsproductdugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNmanufacturerInfomanufacturerOKSMcountryCode'	: 'productsmanufacturerOKSMcountryCode',
-#     'productsproductmanufacturerOKSMcountryFullName'			: 'productsmanufacturerOKSMcountryFullName',
-#     'productsproductdrugPrchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNamemanufarerInfomanufacturerOKSMcountryFullName'	: 'productsmanufacturerOKSMcountryFullName',
-#     'productsproductmanufacturerInfomanufacturerName'			: 'productsmanufacturerInfomanufacturerName',
-#     'produtsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositradeNamemanufacturerInfomanufacturerName'	: 'productsmanufacturerInfomanufacturerName',
-#     'puctsproductpositionTradeNameMNNNormName'				: 'productspositionTradeNameMNNNormName',
-#     'prosproductpositionTradeNamedosageNormName'			: 'productspositionTradeNamedosageNormName',
-#     'productsproductexpirationDateMonthYearmonth'				: 'productsexpirationDateMonhYearmonth',
-#     'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoexpiratioeCustomFormatInfoexpirationDateMonthYearmonth'	: 'productsexpirationDateMonthYearmonth',
-#     'productsproductexpirationDateMonthYearyear'				: 'productsexpirationDateMnthYearyear',
-#     'productsproductdrugPurchaseObjectInfodrugIerenceInfoexpirationDateCustomFormatInfoexpiMonthYearyear'	: 'productsexpirationDateMonthYearyear','priceInfoprice'											: 'priceInfoprice','priceInfopriceType'										: 'priceInfopriceType',
-#     'prirencycode'										: 'priceInfocurrencycode',
-#     'priceInfocurr'										: 'priceInfocurrencyname',
-#     'priceInfocurre'									: 'priceInfocurrencyRaterate',
-#     'rrencyRateraiting'								: 'priceInfocurrencyRateraiting',
-#     'priceInfopriceRUR'											: 'priceInfopriceRUR','priceInfopriceVAT'											: 'priceInfopriceVAT',
-#     'popriceVATRUR'										: 'priceInfopriceVATRUR',
-#     'priceInfopriceFormula'										:'priceInfopriceFormula',
-#     'priceInfoamountsReducedByTaxes'							: 'priceoamountsReducedByTaxes',
-#     'supplierssupplierindividualPersonRFme'				: 'supplierslastName',
-#     'supplierssupplierlegalEntityRFcontactInfolastName'			: 'suppierslastName',
-#     'supplierssuppliercontactInfolastName'						: 'supplierslastName',
-#     'supplersInfosupplierInfolegalEntityRFotherInfocontactInfolastName'	: 'supplierslastNa',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfolastName'	: 'sulierslastName',
-#     'suppliersInfosupplierInfoindividualPersonRFlastName'		: 'supierslastName',
-#     'supplierssupplierindividualPersonForeignStatelastName'		: 'supplierslastName',
-#     'supplierssupplierindividualPersonRFisCulturelastName'		: 'supplslastName',
-#     'suppliersInfosupplierInfocontactInfolastName'				: 'supplierslastName',
-#     'suppliersInosupplierInfoindividualPersonForeignStatelastName'			: 'supplierslastName',
-#     'supplierfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfolastName'	: 'sierslastName',
-#     'suppliersInfosupplierInfoindividualPersonRFisCulturelastName'			: 'supplierslasame',
-#     'suppliersInfosupplierInfoEGRIPInfolastName'				: 'supplierslase',
-#     'suppliersInfosupplierInfoindividualPersonForeignStateisCulturelastName'	: 'supplierslastName',
-#     'supplierssupplierindividualPersonRFfir'				: 'suppliersfirstName',
-#     'supplierssupplierlegalEntityRFcontactInfofirstName'		: 'suppliesfirstName',
-#     'supplierssuppliercontactInfofirstName'						: 'suppliersfirstName',
-#     'suppliesInfosupplierInfolegalEntityRFotherInfocontactInfofirstName'	: 'suppliersfirstName',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfofirstName'	: 'supplrsfirstName',
-#     'supplierssupplierindividualPersonForeignStatefirstName'	: 'suppersfirstName',
-#     'supplierssupplierindividualPersonRFisCulturefirstName'		:'suppliersfirstName',
-#     'suppliersInfosupplierInfoindividualPersonRFfirstName'		: 'supplrsfirstName',
-#     'suppliersInfosupplierInfocontactInfofirstName'				: 'suppliersfirstName',
-#     'suppliersnfosupplierInfoindividualPersonForeignStatefirstName'		: 'suppliersfirstName',
-#     'supplienfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfofirstName'	: 'siersfirstName',
-#     'suppliersInfosupplierInfoindividualPersonRFisCulturefirstName'			: 'suppliersfirName',
-#     'suppliersInfosupplierInfoEGRIPInfofirstName'				: 'suppliersfirme',
-#     'suppliersInfosupplierInfoindividualPersonForeignStateisCulturefirstName'	: 'suppliersfirstName',
-#     'supplierssupplierindividualPersonRFmidde'				: 'suppliersmiddleName',
-#     'supplierssupplierlegalEntityRFcontactInfomiddleName'		: 'supplirsmiddleName',
-#     'supplierssuppliercontactInfomiddleName'					: 'suppliersmiddleName',
-#     'supplirsInfosupplierInfolegalEntityRFotherInfocontactInfomiddleName'	: 'suppliersmiddleName',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfomiddleName'	: 'supplersmiddleName',
-#     'supplierssupplierindividualPersonForeignStatemiddleName'	: 'supiersmiddleName',
-#     'supplierssupplierindividualPersonRFisCulturemiddleName'	:'suppliersmiddleName',
-#     'suppliersInfosupplierInfoindividualPersonRFmiddleName'		: 'supplrsmiddleName',
-#     'suppliersInfosupplierInfocontactInfomiddleName'			: 'suppliersmiddleName',
-#     'suppliersnfosupplierInfoindividualPersonForeignStatemiddleName'		: 'suppliersmiddleName',
-#     'supplieInfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfomiddleName'	: 'siersmiddleName',
-#     'suppliersInfosupplierInfoindividualPersonRFisCulturemiddleName'		: 'suppliersmiddame',
-#     'suppliersInfosupplierInfoEGRIPInfomiddleName'				: 'suppliddleName',
-#     'suppliersInfosupplierInfoindividualPersonStateisCulturemiddleName'			: 'suppliersmiddleName',
-#     'supplierssuppliendividualPersonRFINN'					: 'suppliersINN',
-#     'supplierssupplierlegalEntityRFINN'							: 'suppliersINN',
-#     'suppliersInfosupplierInfolegalEntityRFEGRULInfN'		: 'suppliersINN',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfoINN'		: 'suppliersINN',
-#     'supplierssupplierindividualPersonRFireINN'			: 'suppliersINN',
-#     'supplierssupplierlegalEntityForeignStaegisterInRFTaxBodiesINN'		: 'suppliersINN',
-#     'suppliersInfosupplierInfoEGRULInfoINN'						: 'supplersINN',
-#     'suppliersInfosupplierInfoindividualPersonRFINN'			: 'suppliersINN',
-#     'suppliernfosupplierInfoindividualPersonForeignStateregisterInRFTaxBodiesINN'	: 'suppliesINN',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfoINN'		: 'suppiersINN',
-#     'suppliersInfosupplierInfoindividualPersonRFisCINN'	: 'suppliersINN',
-#     'supplierssupplierindividualPersonForeignStateisterInRFTaxBodiesINN'	: 'suppliersINN',
-#     'suppliersInfosupplierInfoEGRIPInfoINN'						: 'supiersINN',
-#     'suppliersInfosupplierInforegisterInRFTaxBodiesINN'			:'suppliersINN',
-#     'suppliersInfosupplierInfolegalEneignStateregisterInRFTaxBodiesINN'		: 'suppliersINN',
-#     'supplierssuppliregisterInRFTaxBodiesINN'					: 'suppliersINN',
-#     'supplierssupplierlegalEntityRFKPP'							: 'suppliersKPP',
-#     'suppliersInfosupplierInfolegalEntitULInfoKPP'		: 'suppliersKPP',
-#     'supplierssupplierlegalEntityForeignStateregisterInRFTaxBodiesKP'			: 'suppliersKPP',
-#     'suppliersInfosupplierInfoEGRULInfoKPP'						:'suppliersKPP',
-#     'suppliersInfosupplierInfolegalEntityRFlegalEntityRFSubdivisionEGRULIKPP'	: 'suppliersKPP',
-#     'supplierssupplierlegalEntityRFlargestTaxpayerKPP'			: 'suppliersKPP',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfolestTaxpayerKPP'			: 'suppliersKPP',
-#     'suppliersInfosupplierInfootherInfolargestTaxpayerKPP'		: 'suppliersKPP',
-#     'suppliersInfosupplierInforegisterInRFTaxBoPP'			: 'suppliersKPP',
-#     'suppliersInfosupplierInfolegalEntityForeignStateregisterInRTaxBodiesKPP'	: 'suppliersKPP',
-#
-#     'supplierssupplierindividualPersonRFisIP'					: 'suppliersisIP',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrotheroisIP' : 'suppliersisIP',
-#
-#     'supplierssupplierindividualPersonRFregistrationDate'		: 'suppliersreistrationDate',
-#     'supplierssupplierlegalEntityRFregistrationDate'			: 'suppliersregistrationDate',
-#     'supplersInfosupplierInfolegalEntityRFEGRULInforegistrationDate'	: 'suegistrationDate',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrEInforegistrationDate'	: 'suppliersregistrationDate',
-#
-#     'suppliersserOKTMOcode'								: 'suppliersOKTMOcode',
-#     'supplierssupplierindividualPersonRFOKMOcode'				: 'suppliersOKTMOcode',
-#     'supplierssupplierlegalEntityRFOKTMOcode'					: 'suppliersOTMOcode',
-#     'suppliersInfosupplierInfolegalEntityRFotheMOcode'	: 'suppliersOKTMOcode',
-#     'suppliersInfosupplierInfoindividualPeRFIndEntrotherInfoOKTMOcode'	: 'suppliersOKTMOcode',
-#
-#     'suppliersserOKTMOname'								: 'suppliersOKTMOname',
-#     'supplierssupplierindividualPersonRFOKMOname'				: 'suppliersOKTMOname',
-#     'supplierssupplierlegalEntityRFOKTMOname'					: 'suppliersOTMOname',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfoOKTMOname'	:'suppliersOKTMOname',
-#     'suppliersInfosupplierInfoindividualPeIndEntrotherInfoOKTMOname'	: 'suppliersOKTMOname',
-#
-#     'supplierssupplierindividulPersonRFaddress'				: 'suppliersaddress',
-#     'supplierssupplierlegalEntityRFaddress'						:'suppliersaddress',
-#     'suppliersInfosupplierInfolegalEntityRFEGRULInfoaddress'	: 'suppliersaddress',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEGRIPInfoaddress'	: 'suppliersaddress',
-#
-#     'supplierssupplierindividualPersonRFcontactEMail'			: 'supplierscontactEMail',
-#     'supplierssupplierlegalEntityRFcontactEMail'				: 'supplierscontactEMal',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfocontactEMail'	: 'supplierntactEMail',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInntactEMail'	: 'supplierscontactEMail',
-#
-#     'supplierssupplierindividualPersonRFcontactPhone'			: 'supplierscontactPhone',
-#     'supplierssupplierlegalEntityRFcontactPhone'				: 'supplierscontactPhoe',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfocontactPhone'	: 'supplcontactPhone',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInfocontactPhone'	:'supplierscontactPhone',
-#
-#     'supplierssupplierindividualPersonRFisCulture'				: 'supplierCulture',
-#
-#     'supplierssupplierindividualPersonRFpostAddressInfomailingAdress'	: 'suppliersmailingAdress',
-#     'supplierssupplierlegalEntityRFpostAdressInfomaiAdress'			: 'suppliersmailingAdress',
-#     'supplierssupplierpostAdressInfomailingAdress'				: 'suppliersmailngAdress',
-#     'supplierssupplierpostAddressInfomailingAdress'				: 'supplielingAdress',
-#     'suppliersInfosupplierInfolegalEntityRFotherInAdressInfomailingAdress'	: 'suppliersmailingAdress',
-#
-#     'supplierssupplierindidualPersonRFstatus'					: 'suppliersstatus',
-#     'supplierssupplierlegalEntityRFstatus'					: 'suppliersstatus',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfostatus'		: 'suppliersstatus',
-#     'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInfostatus'	: 'suppliersstat',
-#
-#     'supplierssupplierindividualPersonRFpostAddressInfomailFacilityName': 'supplsmailFacilityName',
-#     'supplierssupplierlegalEntityRFpostAdressInfomailFacilityName'	: 'suppliersmailFacilityName',
-#     'supplierssupplierpostAdressInfomailFacilityName'			: 'suppliersmailFacilityNme',
-#     'supplierssupplierpostAddressInfomailFacilityName'			: 'suppliersmailFacilityName',
-#     'supliersInfosupplierInfolegalEntityRFotherInfopostAdressInfomailFacilityName'	: 'suppliersmaililityName',
-#
-#     'supplierssupplierindividualPersonRFpostAddressInfopostBoxNumber'	: 'supplierspostBoxNumber',
-#     'supplierssupplierlegalEntityRFpostAdressInfopoxNumber'			: 'supplierspostBoxNumber',
-#     'supplierssupplierpostAdressInfopostBoxNumber'				: 'supplierspotBoxNumber',
-#     'supplierssupplierpostAddressInfopostBoxNumber'				: 'supplostBoxNumber',
-#     'suppliersInfosupplierInfolegalEntityRFotherInfopostAdressIpostBoxNumber'	: 'supplierspostBoxNumber',
-#
-#     'supplierssupplierlegalEntitostAddress'					: 'supplierspostAddress',
-#     'supplierssupplierualPersonRFpostAddress'			: 'supplierspostAddress',
-#
-#     'supplierssupplierlegalEntityRFlegalFrmcode'				: 'supplierslegalFormcode',
-#     'supplierssupplierlegalFormcode'							: 'splierslegalFormcode',
-#     'suppliersInfosupplierInfolegalEntityRFEGRULInfolegalFde'	: 'supplierslegalFormcode',
-#
-#     'supplierssupplierlegalEntityRFlegalFormsingularName'		: 'supplierslegalFrmsingularName',
-#     'supplierssupplierlegalFormsingularName'					: 'supplierslegmsingularName',
-#     'suppliersInfosupplierInfolegalEntityRFEGRULInfolegalFormsingulaName'	: 'supplierslegalFormsingularName',
-#
-#     'supplierssupplierlegatyRFfullName'					: 'suppliersfullName',
-#     'suppliersInfosupplierInfolegalEntityRFEGULInfofullName'	: 'suppliersfullName',
-#
-#     'supplierssupplierlegtyRFshortName'					: 'suppliersshortName',
-#     'suppliersInfosupInfolegalEntityRFEGRULInfoshortName'	: 'suppliersshortName',
-#
-#     'supplierssupplieregalEntityRFOKPO'						: 'suppliersOKPO',
-#
-#     'supplierssupplierlegalEntFfirmName'					: 'suppliersfirmName',
-#     'suppliersInfosupplierInfolegalEntityRFEGRULInfofirmName'	: 'suppliersfirmName',
-#
-#     'supplierssupplierlegalEntityRFcontractPrice'				: 'supplierscontractPrice'
-# }
-
-fieldsLinks = {
-    'id'													: 'id','publishDate'												: 'publishDate','customerregNum'											: 'customerregNum','customerconsRegistryNum'									: 'customerconsRegistryNum',
-    'customerfullName'											: 'customerfullName','customershortName'											: 'customershortName',
-    'customerregistrationDate'									: 'customerDate',
-    'customerinn'												:'customerinn',
-    'customerkpp'												:'customerkpp',
-    'customerlegalFormcode'										: 'cusalFormcode',
-    'customerlegalFormsingularName'								:'customerlegalFormsingularName',
-    'cu'												: 'customerOKPO',
-    'curCode'										: 'custode',
-    'regNum'													: 'regNum',
-    'number'													: 'number','contractSubject'											:'contractSubject',
-    'href'														: 'href',
-    'printFormurl'												: 'printFormurl',
-    'printFormdocRegNumber'										: 'printFoumber',
-    'productsproductsid'										: 'productsid','productsproductOKPD2code'									: 'produce',
-    'productsproductOKPD2name'									: 'pPD2name',
-    'productsproductname'										: 'productsname',
-    'productsproductOKEIcode'									: 'productsOKEIcode',
-    'productOKEInationalCode'							: 'productsOKEInationalCode',
-    'productsproductOKEIfullName'								: 'produclName',
-    'productsproductprice'										: 'productsprice',
-    'productsproductpriceRUR'									: 'productspriceRUR','productsproductwhitoutVATPrice'							: 'produVATPrice',
-    'productsproductquantity'									:'productsquantity',
-    'productsproductsum'										:'productssum',
-    'productsproductsumRUR'										:'productssumRUR',
-    'productsproductwithoutVATSum'								: 'productswithoutVATSum',
-    'productsproductVATRate'									: 'productsVATRate',
-    'productsproductVATSum'										: 'productsVATSum',
-    'prosproductoriginCountrycountryCode'					: 'productsoriginCountrycountryCode','productsproductoriginCountrycountryFullName'				:'productsoriginCountrycountryFullName',
-    'productsTRUcode'									: 'productsKTRUcode',
-    'productsproductKTRUname'									: 'productsKTRUname',
-    'productsproductKTRUOKPD2code'								: 'productsKTRUOKPD2code',
-    'productsproductKTRUOKPD2name'								: 'productsKTRUOKPD2name',
-    'productsproductMNInfoMNNName'								: 'productsMNNInfoMNNName',
-    'productsproduurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfoMNNName'	: 'productsMNNInfoMNNName',
-    'productsproductdosageUserOKEIcode'							: 'roductsdosageUserOKEIcode',
-    'productsproductdrugPurchaseObjectInfodUsingReferenceInfoMNNsInfoMNNInfodosageUserdosageUserOKEIcode'	: 'productsdosageUserOKEIcode',
-    'productsproductdosageUserOKEIname'							: 'roductsdosageUserOKEIname',
-    'productsproductdrugPurchaseObjectInfodrugInfgReferenceInfoMNNsInfoMNNInfodosageUserdosageUserOKEIname'	: 'productsdosageUserOKEIname',
-    'productsproductdosageUserdosageUserName'					: 'prductsdosageUserdosageUserName',
-    'productsproductdrugPurchaseObjectInfodruingReferenceInfoMNNsInfoMNNInfodosageUserdosageUserName'	: 'productsdosageUserdosageUserName',
-    'productsproducttradeInfotradeName'							: 'productstradeInfotradeNam',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfoptionsTradeNamepositionTradeNametradeInfotradeName'	: 'productstradeInfotradeName',
-    'productsproductpositionTradeNamecertificateNumber'			: 'productspositionTradeNamecertificateNumbr',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNameposiionTradeNamecertificateNumber'	: 'productspositionTradeNamecertificateNumber',
-    'productsproductmedicamentalFormInfomedicamentalFormName'	: 'productsmedicamentalFormInfomedicamentalFormName',
-    'productsprodutdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNamemedtalFormInfomedicamentalFormName'	: 'productsproductmedicamentalFormInfomedicamentalFormName',
-    'productsproductdosageInfodosageName'						: 'productsdosageInfodosageName',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNInfopositionsTradeNamepositionTradeNamedosageInfodosageName'	: 'productsdosageInfodosageName',
-    'productsproductdosageOKEIcode'								: 'productsdosageOKEIcode',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInnfopositionsTradeNamepositionTradeNamedosageInfodosageOKEIcode'	: 'productsdosageOKEIcode',
-    'productsproductdosageOKEInationalCode'						: 'productsdosageOKEInationalCode',
-    'produtsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfnsTradeNamepositionTradeNamedosageInfodosageOKEInationalCode'	: 'produageOKEInationalCode',
-    'productsproductdosageOKEIname'								: 'productsdosageOKEIname',
-    'productsproductdosageInfodosageValue'						: 'productsdosageInfodosageValue',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNIsitionsTradeNamepositionTradeNamedosageInfodosageValue'	: 'productsdosageInfodosageValue',
-    'productsproductdosageInfodosageUserName'					: 'productsdosageInfodosageUserName',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamositionTradeNamedosageInfodosageUserName'	: 'productsdosageInfodosageUserName',
-    'productsproductpositionTradeNamecertificateKeeperName'		: 'productspositionTradeNamecertificateKeeperName',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamitionTradeNamecertificateKeeperName'	: 'productspositionTradeNamecertificateKeeperName',
-    'productsproductmanufacturerOKSMcountryCode'				: 'productsmanufacturerOKSMcountryCode',
-    'productsproductdugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNmanufacturerInfomanufacturerOKSMcountryCode'	: 'productsmanufacturerOKSMcountryCode',
-    'productsproductmanufacturerOKSMcountryFullName'			: 'productsmanufacturerOKSMcountryFullName',
-    'productsproductdrugPrchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositionTradeNamemanufarerInfomanufacturerOKSMcountryFullName'	: 'productsmanufacturerOKSMcountryFullName',
-    'productsproductmanufacturerInfomanufacturerName'			: 'productsmanufacturerInfomanufacturerName',
-    'produtsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoMNNsInfoMNNInfopositionsTradeNamepositradeNamemanufacturerInfomanufacturerName'	: 'productsmanufacturerInfomanufacturerName',
-    'puctsproductpositionTradeNameMNNNormName'				: 'productspositionTradeNameMNNNormName',
-    'prosproductpositionTradeNamedosageNormName'			: 'productspositionTradeNamedosageNormName',
-    'productsproductexpirationDateMonthYearmonth'				: 'productsexpirationDateMonhYearmonth',
-    'productsproductdrugPurchaseObjectInfodrugInfoUsingReferenceInfoexpiratioeCustomFormatInfoexpirationDateMonthYearmonth'	: 'productsexpirationDateMonthYearmonth',
-    'productsproductexpirationDateMonthYearyear'				: 'productsexpirationDateMnthYearyear',
-    'productsproductdrugPurchaseObjectInfodrugIerenceInfoexpirationDateCustomFormatInfoexpiMonthYearyear'	: 'productsexpirationDateMonthYearyear','priceInfoprice'											: 'priceInfoprice','priceInfopriceType'										: 'priceInfopriceType',
-    'prirencycode'										: 'priceInfocurrencycode',
-    'priceInfocurr'										: 'priceInfocurrencyname',
-    'priceInfocurre'									: 'priceInfocurrencyRaterate',
-    'rrencyRateraiting'								: 'priceInfocurrencyRateraiting',
-    'priceInfopriceRUR'											: 'priceInfopriceRUR','priceInfopriceVAT'											: 'priceInfopriceVAT',
-    'popriceVATRUR'										: 'priceInfopriceVATRUR',
-    'priceInfopriceFormula'										:'priceInfopriceFormula',
-    'priceInfoamountsReducedByTaxes'							: 'priceoamountsReducedByTaxes',
-    'supplierssupplierindividualPersonRFme'				: 'supplierslastName',
-    'supplierssupplierlegalEntityRFcontactInfolastName'			: 'suppierslastName',
-    'supplierssuppliercontactInfolastName'						: 'supplierslastName',
-    'supplersInfosupplierInfolegalEntityRFotherInfocontactInfolastName'	: 'supplierslastNa',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfolastName'	: 'sulierslastName',
-    'suppliersInfosupplierInfoindividualPersonRFlastName'		: 'supierslastName',
-    'supplierssupplierindividualPersonForeignStatelastName'		: 'supplierslastName',
-    'supplierssupplierindividualPersonRFisCulturelastName'		: 'supplslastName',
-    'suppliersInfosupplierInfocontactInfolastName'				: 'supplierslastName',
-    'suppliersInosupplierInfoindividualPersonForeignStatelastName'			: 'supplierslastName',
-    'supplierfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfolastName'	: 'sierslastName',
-    'suppliersInfosupplierInfoindividualPersonRFisCulturelastName'			: 'supplierslasame',
-    'suppliersInfosupplierInfoEGRIPInfolastName'				: 'supplierslase',
-    'suppliersInfosupplierInfoindividualPersonForeignStateisCulturelastName'	: 'supplierslastName',
-    'supplierssupplierindividualPersonRFfir'				: 'suppliersfirstName',
-    'supplierssupplierlegalEntityRFcontactInfofirstName'		: 'suppliesfirstName',
-    'supplierssuppliercontactInfofirstName'						: 'suppliersfirstName',
-    'suppliesInfosupplierInfolegalEntityRFotherInfocontactInfofirstName'	: 'suppliersfirstName',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfofirstName'	: 'supplrsfirstName',
-    'supplierssupplierindividualPersonForeignStatefirstName'	: 'suppersfirstName',
-    'supplierssupplierindividualPersonRFisCulturefirstName'		:'suppliersfirstName',
-    'suppliersInfosupplierInfoindividualPersonRFfirstName'		: 'supplrsfirstName',
-    'suppliersInfosupplierInfocontactInfofirstName'				: 'suppliersfirstName',
-    'suppliersnfosupplierInfoindividualPersonForeignStatefirstName'		: 'suppliersfirstName',
-    'supplienfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfofirstName'	: 'siersfirstName',
-    'suppliersInfosupplierInfoindividualPersonRFisCulturefirstName'			: 'suppliersfirName',
-    'suppliersInfosupplierInfoEGRIPInfofirstName'				: 'suppliersfirme',
-    'suppliersInfosupplierInfoindividualPersonForeignStateisCulturefirstName'	: 'suppliersfirstName',
-    'supplierssupplierindividualPersonRFmidde'				: 'suppliersmiddleName',
-    'supplierssupplierlegalEntityRFcontactInfomiddleName'		: 'supplirsmiddleName',
-    'supplierssuppliercontactInfomiddleName'					: 'suppliersmiddleName',
-    'supplirsInfosupplierInfolegalEntityRFotherInfocontactInfomiddleName'	: 'suppliersmiddleName',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfomiddleName'	: 'supplersmiddleName',
-    'supplierssupplierindividualPersonForeignStatemiddleName'	: 'supiersmiddleName',
-    'supplierssupplierindividualPersonRFisCulturemiddleName'	:'suppliersmiddleName',
-    'suppliersInfosupplierInfoindividualPersonRFmiddleName'		: 'supplrsmiddleName',
-    'suppliersInfosupplierInfocontactInfomiddleName'			: 'suppliersmiddleName',
-    'suppliersnfosupplierInfoindividualPersonForeignStatemiddleName'		: 'suppliersmiddleName',
-    'supplieInfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfomiddleName'	: 'siersmiddleName',
-    'suppliersInfosupplierInfoindividualPersonRFisCulturemiddleName'		: 'suppliersmiddame',
-    'suppliersInfosupplierInfoEGRIPInfomiddleName'				: 'suppliddleName',
-    'suppliersInfosupplierInfoindividualPersonStateisCulturemiddleName'			: 'suppliersmiddleName',
-    'supplierssuppliendividualPersonRFINN'					: 'suppliersINN',
-    'supplierssupplierlegalEntityRFINN'							: 'suppliersINN',
-    'suppliersInfosupplierInfolegalEntityRFEGRULInfN'		: 'suppliersINN',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrEGRIPInfoINN'		: 'suppliersINN',
-    'supplierssupplierindividualPersonRFireINN'			: 'suppliersINN',
-    'supplierssupplierlegalEntityForeignStaegisterInRFTaxBodiesINN'		: 'suppliersINN',
-    'suppliersInfosupplierInfoEGRULInfoINN'						: 'supplersINN',
-    'suppliersInfosupplierInfoindividualPersonRFINN'			: 'suppliersINN',
-    'suppliernfosupplierInfoindividualPersonForeignStateregisterInRFTaxBodiesINN'	: 'suppliesINN',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrisCultureEGRIPInfoINN'		: 'suppiersINN',
-    'suppliersInfosupplierInfoindividualPersonRFisCINN'	: 'suppliersINN',
-    'supplierssupplierindividualPersonForeignStateisterInRFTaxBodiesINN'	: 'suppliersINN',
-    'suppliersInfosupplierInfoEGRIPInfoINN'						: 'supiersINN',
-    'suppliersInfosupplierInforegisterInRFTaxBodiesINN'			:'suppliersINN',
-    'suppliersInfosupplierInfolegalEneignStateregisterInRFTaxBodiesINN'		: 'suppliersINN',
-    'supplierssuppliregisterInRFTaxBodiesINN'					: 'suppliersINN',
-    'supplierssupplierlegalEntityRFKPP'							: 'suppliersKPP',
-    'suppliersInfosupplierInfolegalEntitULInfoKPP'		: 'suppliersKPP',
-    'supplierssupplierlegalEntityForeignStateregisterInRFTaxBodiesKP'			: 'suppliersKPP',
-    'suppliersInfosupplierInfoEGRULInfoKPP'						:'suppliersKPP',
-    'suppliersInfosupplierInfolegalEntityRFlegalEntityRFSubdivisionEGRULIKPP'	: 'suppliersKPP',
-    'supplierssupplierlegalEntityRFlargestTaxpayerKPP'			: 'suppliersKPP',
-    'suppliersInfosupplierInfolegalEntityRFotherInfolestTaxpayerKPP'			: 'suppliersKPP',
-    'suppliersInfosupplierInfootherInfolargestTaxpayerKPP'		: 'suppliersKPP',
-    'suppliersInfosupplierInforegisterInRFTaxBoPP'			: 'suppliersKPP',
-    'suppliersInfosupplierInfolegalEntityForeignStateregisterInRTaxBodiesKPP'	: 'suppliersKPP',
-
-    'supplierssupplierindividualPersonRFisIP'					: 'suppliersisIP',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrotheroisIP' : 'suppliersisIP',
-
-    'supplierssupplierindividualPersonRFregistrationDate'		: 'suppliersreistrationDate',
-    'supplierssupplierlegalEntityRFregistrationDate'			: 'suppliersregistrationDate',
-    'supplersInfosupplierInfolegalEntityRFEGRULInforegistrationDate'	: 'suegistrationDate',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrEInforegistrationDate'	: 'suppliersregistrationDate',
-
-    'suppliersserOKTMOcode'								: 'suppliersOKTMOcode',
-    'supplierssupplierindividualPersonRFOKMOcode'				: 'suppliersOKTMOcode',
-    'supplierssupplierlegalEntityRFOKTMOcode'					: 'suppliersOTMOcode',
-    'suppliersInfosupplierInfolegalEntityRFotheMOcode'	: 'suppliersOKTMOcode',
-    'suppliersInfosupplierInfoindividualPeRFIndEntrotherInfoOKTMOcode'	: 'suppliersOKTMOcode',
-
-    'suppliersserOKTMOname'								: 'suppliersOKTMOname',
-    'supplierssupplierindividualPersonRFOKMOname'				: 'suppliersOKTMOname',
-    'supplierssupplierlegalEntityRFOKTMOname'					: 'suppliersOTMOname',
-    'suppliersInfosupplierInfolegalEntityRFotherInfoOKTMOname'	:'suppliersOKTMOname',
-    'suppliersInfosupplierInfoindividualPeIndEntrotherInfoOKTMOname'	: 'suppliersOKTMOname',
-
-    'supplierssupplierindividulPersonRFaddress'				: 'suppliersaddress',
-    'supplierssupplierlegalEntityRFaddress'						:'suppliersaddress',
-    'suppliersInfosupplierInfolegalEntityRFEGRULInfoaddress'	: 'suppliersaddress',
-    'suppliersInfosupplierInfoindividualPersonRFIndEGRIPInfoaddress'	: 'suppliersaddress',
-
-    'supplierssupplierindividualPersonRFcontactEMail'			: 'supplierscontactEMail',
-    'supplierssupplierlegalEntityRFcontactEMail'				: 'supplierscontactEMal',
-    'suppliersInfosupplierInfolegalEntityRFotherInfocontactEMail'	: 'supplierntactEMail',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInntactEMail'	: 'supplierscontactEMail',
-
-    'supplierssupplierindividualPersonRFcontactPhone'			: 'supplierscontactPhone',
-    'supplierssupplierlegalEntityRFcontactPhone'				: 'supplierscontactPhoe',
-    'suppliersInfosupplierInfolegalEntityRFotherInfocontactPhone'	: 'supplcontactPhone',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInfocontactPhone'	:'supplierscontactPhone',
-
-    'supplierssupplierindividualPersonRFisCulture'				: 'supplierCulture',
-
-    'supplierssupplierindividualPersonRFpostAddressInfomailingAdress'	: 'suppliersmailingAdress',
-    'supplierssupplierlegalEntityRFpostAdressInfomaiAdress'			: 'suppliersmailingAdress',
-    'supplierssupplierpostAdressInfomailingAdress'				: 'suppliersmailngAdress',
-    'supplierssupplierpostAddressInfomailingAdress'				: 'supplielingAdress',
-    'suppliersInfosupplierInfolegalEntityRFotherInAdressInfomailingAdress'	: 'suppliersmailingAdress',
-
-    'supplierssupplierindidualPersonRFstatus'					: 'suppliersstatus',
-    'supplierssupplierlegalEntityRFstatus'					: 'suppliersstatus',
-    'suppliersInfosupplierInfolegalEntityRFotherInfostatus'		: 'suppliersstatus',
-    'suppliersInfosupplierInfoindividualPersonRFIndEntrotherInfostatus'	: 'suppliersstat',
-
-    'supplierssupplierindividualPersonRFpostAddressInfomailFacilityName': 'supplsmailFacilityName',
-    'supplierssupplierlegalEntityRFpostAdressInfomailFacilityName'	: 'suppliersmailFacilityName',
-    'supplierssupplierpostAdressInfomailFacilityName'			: 'suppliersmailFacilityNme',
-    'supplierssupplierpostAddressInfomailFacilityName'			: 'suppliersmailFacilityName',
-    'supliersInfosupplierInfolegalEntityRFotherInfopostAdressInfomailFacilityName'	: 'suppliersmaililityName',
-
-    'supplierssupplierindividualPersonRFpostAddressInfopostBoxNumber'	: 'supplierspostBoxNumber',
-    'supplierssupplierlegalEntityRFpostAdressInfopoxNumber'			: 'supplierspostBoxNumber',
-    'supplierssupplierpostAdressInfopostBoxNumber'				: 'supplierspotBoxNumber',
-    'supplierssupplierpostAddressInfopostBoxNumber'				: 'supplostBoxNumber',
-    'suppliersInfosupplierInfolegalEntityRFotherInfopostAdressIpostBoxNumber'	: 'supplierspostBoxNumber',
-
-    'supplierssupplierlegalEntitostAddress'					: 'supplierspostAddress',
-    'supplierssupplierualPersonRFpostAddress'			: 'supplierspostAddress',
-
-    'supplierssupplierlegalEntityRFlegalFrmcode'				: 'supplierslegalFormcode',
-    'supplierssupplierlegalFormcode'							: 'splierslegalFormcode',
-    'suppliersInfosupplierInfolegalEntityRFEGRULInfolegalFde'	: 'supplierslegalFormcode',
-
-    'supplierssupplierlegalEntityRFlegalFormsingularName'		: 'supplierslegalFrmsingularName',
-    'supplierssupplierlegalFormsingularName'					: 'supplierslegmsingularName',
-    'suppliersInfosupplierInfolegalEntityRFEGRULInfolegalFormsingulaName'	: 'supplierslegalFormsingularName',
-
-    'supplierssupplierlegatyRFfullName'					: 'suppliersfullName',
-    'suppliersInfosupplierInfolegalEntityRFEGULInfofullName'	: 'suppliersfullName',
-
-    'supplierssupplierlegtyRFshortName'					: 'suppliersshortName',
-    'suppliersInfosupInfolegalEntityRFEGRULInfoshortName'	: 'suppliersshortName',
-
-    'supplierssupplieregalEntityRFOKPO'						: 'suppliersOKPO',
-
-    'supplierssupplierlegalEntFfirmName'					: 'suppliersfirmName',
-    'suppliersInfosupplierInfolegalEntityRFEGRULInfofirmName'	: 'suppliersfirmName',
-
-    'supplierssupplierlegalEntityRFcontractPrice'				: 'supplierscontractPrice'
-}
 
 def db_connect():
     """Соединение с базой данных"""
-    config = {
-        'user': 'root',
-        'password': 'root',
-        'host': 'localhost',
-        'port': '3306',
-        'database': 'contracts',
-        'raise_on_warnings': True
-    }
     return mysql.connect(**config)
 
 
@@ -517,13 +35,13 @@ def get_contracts_numbers(table):
     try:
         connection = db_connect()
         with connection.cursor() as cursor:
-            query = f"SELECT regNum, publishDate FROM {table}"
+            query = f"SELECT id, regNum, publish_date FROM {table}"
             cursor.execute(query)
             ids = cursor.fetchall()
         connection.close()
         result = {}
         for i in ids:
-            result[i[0]] = {'regNum': i[0], 'publishDate': i[1]}
+            result[i[0]] = {'id': i[0], 'regNum': i[1], 'publish_date': i[2]}
         return result
     except Exception as e:
         print(f'The error was occurred at the function get_contracts_numbers:\n{e}')
@@ -590,40 +108,6 @@ WHERE
         print(f'The error was occurred at the function get_suppliers_info:\n{e}')
 
 
-def create_columns(columns):
-    """Функция создания столбцов
-    :param columns: Перечень имен столбцов в виде списка"""
-    try:
-        connection = db_connect()
-        columns = ', '.join(columns)
-        with connection.cursor() as cursor:
-            query = "ALTER TABLE `northwestern_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `central_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `volga_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `southern_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `north_caucasian_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `ural_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `siberian_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `far_eastern_fd` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `moscow_and_moscow_region` " + columns
-            cursor.execute(query)
-            query = "ALTER TABLE `crimean_fd` " + columns
-            cursor.execute(query)
-            connection.commit()
-        connection.close()
-        return True
-    except Error as e:
-        print(f'The error was occurred at the function create_columns:\n{e}')
-
-
 def update_values(table, columns, values):
     """Функция обновления записей в таблице
     :param table: Имя таблицы
@@ -676,11 +160,11 @@ def parse_for_update(columns, values):
 
 def parse_sql(data, region):
     """Функция парсера БД"""
-    global fieldsLinks
-    columns_to_add = []
+    # global data.fieldsLinks
+    # columns_to_add = []
     preval = {}
     values = []
-    updates = []
+    # updates = []
     # В зависимости от региона, получаем таблицу для записи
     if region in ['78', '47', '53', '60', '10', '29', '11', '35', '51', '83', '39']:
         table_name = 'northwestern_fd'
@@ -704,26 +188,19 @@ def parse_sql(data, region):
         table_name = 'crimean_fd'
 
     contract_numbers = get_contracts_numbers(table_name)
-    table_columns = get_columns(table_name)
     # Формируем столбцы для добавления в БД
     # !!!Внимание!!! Проверка столбцов чувствительна к регистру. EndDate не равно endDate.
     for notif in data:
         value = {}
         for column in data[notif]:
-            if column in fieldsLinks:
-                col = fieldsLinks[column]
-                if col not in table_columns:
-                    columns_to_add.append(f'ADD {col} mediumtext')
-                    table_columns.append(col)
+            if column in field_links:
+                col = field_links[column]
                 value[col] = data[notif][column]
         preval[notif] = value
-    # Если есть новые столбцы, то добавляем их в БД
-    if len(columns_to_add) > 0:
-        create_columns(columns_to_add)
 
     # Формируем данные для записи/обновления в БД
     for notif in preval:
-        if notif not in contract_numbers:
+        if int(notif) not in contract_numbers:
             value = []
             for it in table_columns:
                 if it in preval[notif]:
@@ -733,28 +210,11 @@ def parse_sql(data, region):
                 else:
                     value.append(None)
             values.append(tuple(value))
-        else:
-            update = []
-            if preval[notif]['publishDate'] >= contract_numbers[notif]['publishDate']:
-                for it in table_columns:
-                    if it in preval[notif]:
-                        update.append(preval[notif][it])
-                    else:
-                        update.append(None)
-
-                update = update[1:]
-                update.append(update.pop(0))
-                updates.append(tuple(update))
-
-                contract_numbers[notif]['publishDate'] = preval[notif]['publishDate']
-
-    # Обновление сущестыующих записей в БД
-    # разкоментировать, чтобы записи обнавлялись, иначе будет пропускать
-    if len(updates) > 0:
-        update_values(table_name, table_columns, updates)
 
     # Добавление новых записей в БД
     if len(values) > 0:
         insert_values(table_name, table_columns, values)
 
-    # print(len(data), len(values), len(updates))
+
+# contract_numbers = get_contracts_numbers('crimean_fd')
+# print(contract_numbers[164013710])
