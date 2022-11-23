@@ -47,8 +47,7 @@ try:
               'moscow_and_moscow_region',
               'crimean_fd']
     columns = ', '.join([f'ADD {i} TEXT' for i in columns if i not in (
-        'id', 'regNum', 'publish_date', 'Печатная_форма_кнтркта',
-        'Текущее_состояние_кнтркта', 'Номер_кнтркта', 'Номер_изменения')])
+        'id', 'regNum', 'publish_date', 'Печатная_форма_кнтркта', 'Номер_кнтркта')])
     create_db()
     connection = db_connect()
     with connection.cursor() as cursor:
@@ -58,9 +57,7 @@ try:
                     regNum BIGINT,
                     publish_date TEXT,
                     Печатная_форма_кнтркта TEXT,
-                    Текущее_состояние_кнтркта TEXT,
-                    Номер_кнтркта TEXT,
-                    Номер_изменения INT
+                    Номер_кнтркта TEXT
                 );'''
             execute_query(create_table)
             create_columns = f'ALTER TABLE {table} {columns}'

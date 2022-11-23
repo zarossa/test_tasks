@@ -193,7 +193,7 @@ config = {
         'password': 'root',
         'host': 'localhost',
         'port': '3306',
-        'database': 'contracts',
+        'database': 'contracts_v2',
         'raise_on_warnings': True
     }       # Данные для подключения к БД
 field_links = {
@@ -201,6 +201,7 @@ field_links = {
     'regNum': 'regNum',
     'publishDate': 'publish_date',
     'printFormurl': 'Печатная_форма_кнтркта',
+    'region': 'Регион',
     'currentContractStage': 'Текущее_состояние_кнтркта',
     'number': 'Номер_кнтркта',
     'versionNumber': 'Номер_изменения',
@@ -369,7 +370,6 @@ field_links = {
     'productsproductKTRUname': 'Объекты_закуп_Классификация_по_КТРУ',
     'productsproductMNNInfoMNNName': 'Объекты_закуп_Наим_лекарств_препарата',
     'productsproductOKEIfullName': 'Объекты_закуп_Единица_измерения',
-    'productsproductOKPD2name': 'Объекты_закуп_Классификация_по_ОКПД2',
     'productsproductVATRate': 'Объекты_закуп_Ставка_НДС',
     'productsproductcharacteristicscharacteristicsUsingReferenceInfoname': 'Объекты_закуп_Характеристика_позиции',
     'productsproductcharacteristicscharacteristicsUsingReferenceInfovalueRangemax': 'Объекты_закуп_Характеристика_позиции_Максимальное_значение',
@@ -442,6 +442,7 @@ columns = [
     'id',
     'regNum',
     'publish_date',
+    'Регион',
     'Печатная_форма_кнтркта',
     'Текущее_состояние_кнтркта',
     'Номер_кнтркта',
@@ -584,7 +585,6 @@ columns = [
     'Объекты_закуп_Классификация_по_КТРУ',
     'Объекты_закуп_Наим_лекарств_препарата',
     'Объекты_закуп_Единица_измерения',
-    'Объекты_закуп_Классификация_по_ОКПД2',
     'Объекты_закуп_Ставка_НДС',
     'Объекты_закуп_Лекарственный_препарат_Наим_МНН',
     'Объекты_закуп_Лекарственный_препарат_Торговое_наим',
@@ -644,3 +644,66 @@ def regions(code):
     :param code: Код региона
     :return: Возвращает имя региона или 0, если регион не найден"""
     return region.get(code, 0)
+
+
+# def data_downloading(ftp_con, list_of_files, reg, direction='tmp/'):
+#     """Функция скачивания архивов на локальный сервер
+#     :param ftp_con: Соединение
+#     :param list_of_files: Список файлов для скачивания
+#     :param reg: Имя региона
+#     :param direction: Директория скачивания"""
+#     try:
+#         print(f'Start to download data from {reg}')
+#         for archive in list_of_files:
+#             ftp.ftp_download(ftp_con, archive, direction)
+#     except Exception as error:
+#         print(f'Неудачная попытка загрузки\n{error}')
+#
+#
+# def data_reading(archive_file, reg, len_list_files):
+#     """Функция чтения архивов
+#     :param reg: Номер региона
+#     :param archive_file: Архив
+#     :param len_list_files: Количество архивов"""
+#     arch_start = 1
+#     xml_start = 1
+#     global all_files
+#     global false_files
+#     global true_files
+#     global error_files
+#     global all_data
+#     global chank
+#     global chank_size
+#     with zipfile.ZipFile(archive_file, 'r') as f:
+#         all_files += len(f.namelist())
+#
+#         # Перебор файлов в архиве
+#         for arch_file in f.namelist():
+#             # Отсеиваем лишние файлы
+#             if 'sig' in arch_file or 'Available' in arch_file or 'Cancel' in arch_file:
+#                 false_files += 1
+#                 continue
+#             true_files += 1
+#
+#             try:
+#                 # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
+#                 one_object = parser_xml.read_xml(f.read(arch_file))
+#                 id_file = list(one_object.keys())[0]
+#                 all_data.update(one_object)
+#                 # if console_debug == 1:
+#                 # print('Parsing xml ' + str(round(
+#                 #     xml_start * (arch_start * 100 / len_list_files) / len(f.namelist()))) + '%',
+#                 #       end='\n')
+#                 xml_start += 1
+#                 chank += 1
+#
+#                 if chank > chank_size - 1:
+#                     sql.parse_sql(all_data, reg)
+#                     all_data = {}
+#                     chank = 0
+#             except Exception as error:
+#                 with open(f'logs/_log.txt', 'a') as log:
+#                     log.write(f'{archive_file}\n{file}\n{error}\n\n')
+#                 error_files += 1
+#                 continue
+

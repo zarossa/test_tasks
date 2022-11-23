@@ -11,23 +11,6 @@ def db_connect():
     return mysql.connect(**config)
 
 
-def get_columns(table):
-    """Функция получения списка столбцов таблицы
-    :param table: Имя таблицы
-    :return: Список столбцов"""
-    try:
-        connection = db_connect()
-        with connection.cursor() as cursor:
-            query = f"SHOW COLUMNS FROM {table}"
-            cursor.execute(query)
-            columns = cursor.fetchall()
-        connection.close()
-        result = [column[0] for column in columns]
-        return result
-    except Error as e:
-        print(f'The error was occurred at the function get_columns:\n{e}')
-
-
 def get_contracts_numbers(table):
     """Функция получения списка контрактов
     :param table: Имя таблицы
@@ -47,89 +30,6 @@ def get_contracts_numbers(table):
         print(f'The error was occurred at the function get_contracts_numbers:\n{e}')
 
 
-def get_suppliers_info(table, region):
-    """Функция получения информации о подрядчиках
-    :param table: Имя таблицы
-    :param region: Регион
-    :return: Информация о подрядчиках"""
-    try:
-        connection = db_connect()
-        query = f"""
-SELECT 
-  `t`.`suppliersINN`, 
-  `t`.`suppliersKPP`, 
-  `t`.`suppliersfullName`, 
-  `t`.`suppliersaddress`, 
-  `t`.`supplierscontactEMail`, 
-  `t`.`supplierscontactPhone`, 
-  `t`.`supplierslastName`, 
-  `t`.`suppliersfirstName`, 
-  `t`.`suppliersmiddleName` 
-FROM 
-  `{table}` AS `t` 
-WHERE 
-  `t`.`region` = '{region}' 
-  AND `t`.`suppliersINN` IS NOT NULL"""
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            contracts = cursor.fetchall()
-        connection.close()
-        result = []
-        for contract in contracts:
-            inn = contract[0].split(';:;')
-            kpp = None if contract[1] is None else contract[1].split(';:;')
-            name = None if contract[2] is None else contract[2].split(';:;')
-            address = None if contract[3] is None else contract[3].split(';:;')
-            email = None if contract[4] is None else contract[4].split(';:;')
-            phone = None if contract[5] is None else contract[5].split(';:;')
-            last_name = None if contract[6] is None else contract[6].split(';:;')
-            first_name = None if contract[7] is None else contract[7].split(';:;')
-            middle_name = None if contract[8] is None else contract[8].split(';:;')
-            k = 0
-
-            for _ in inn:
-                pres = {
-                    'inn': inn[k],
-                    'kpp': '' if kpp is None else (kpp[0] if k >= len(kpp) else kpp[k]),
-                    'name': '' if name is None else (name[0] if k >= len(name) else name[k]),
-                    'address': '' if address is None else (address[0] if k >= len(address) else address[k]),
-                    'email': '' if email is None else (email[0] if k >= len(email) else email[k]),
-                    'phone': '' if phone is None else (phone[0] if k >= len(phone) else phone[k]),
-                    'fio': '' if last_name is None else (last_name[0] if k >= len(last_name) else last_name[k])}
-                pres['fio'] += '' if first_name is None else ' ' + (
-                    first_name[0] if k >= len(first_name) else first_name[k])
-                pres['fio'] += '' if middle_name is None else ' ' + (
-                    middle_name[0] if k >= len(middle_name) else middle_name[k])
-
-                result.append(pres)
-                k += 1
-        return result
-    except Error as e:
-        print(f'The error was occurred at the function get_suppliers_info:\n{e}')
-
-
-def update_values(table, columns, values):
-    """Функция обновления записей в таблице
-    :param table: Имя таблицы
-    :param columns: Перечень имен столбцов в виде списка
-    :param values: Данные для записи в виде списка кортежей"""
-    try:
-        connection = db_connect()
-        columns = columns[3:]
-        columns = [f"{column} = IFNULL(%s, DEFAULT({column}))" for column in columns]
-        sets = ', '.join(columns)
-        for idx, value in enumerate(values):
-            values[idx] = tuple(list(value)[1:-1] + [value[0]])
-        query = f"UPDATE {table} SET {sets} WHERE regNum = %s"
-        with connection.cursor() as cursor:
-            cursor.executemany(query, values)
-            connection.commit()
-        connection.close()
-        return True
-    except Error as e:
-        print(f'The error was occurred at the function update_values:\n{e}')
-
-
 def insert_values(table, columns, values):
     """Функция добавления записей в таблицу
     :param table: Имя таблицы
@@ -147,15 +47,6 @@ def insert_values(table, columns, values):
         return True
     except Error as e:
         print(f'The error was occurred at the function insert_values:\n{e}')
-
-
-def parse_for_update(columns, values):
-    data = {}
-    for idx, column in enumerate(columns):
-        data[column] = {}
-        for value in values:
-            data[column][value[0]] = value[idx + 1]
-    return data
 
 
 def parse_sql(data, region):
@@ -214,7 +105,3 @@ def parse_sql(data, region):
     # Добавление новых записей в БД
     if len(values) > 0:
         insert_values(table_name, table_columns, values)
-
-
-# contract_numbers = get_contracts_numbers('crimean_fd')
-# print(contract_numbers[164013710])

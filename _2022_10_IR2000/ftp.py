@@ -25,11 +25,11 @@ def ftp_cwd(ftp, direction):
 
 
 def ftp_list_of_download(ftp, server_files, local_files):
-    """Функция получения списка файлов для дозагрузки нескачанных файлов
+    """Функция получения списка незагруженных файлов
     :param ftp: FTP-соединение
     :param server_files: Файлы на сервере
     :param local_files: Файлы скачанные
-    :return: Список файлов для дозагрузки"""
+    :return: Список файлов для загрузки"""
     list_files = set()
     files = dict()
     for file in local_files:
@@ -66,3 +66,43 @@ def ftp_download(ftp, file, path_tmp='tmp/'):
         ftp.retrbinary("RETR " + file, f.write)
 
     return path_tmp + file_to
+
+
+def ftp_make_list_files(ftp, reg):
+    """Функция создания списка скачиваемых файлов
+    :param ftp: FTP-соединение
+    :param reg: Название региона
+    :return: Возвращает список файлов для скачивания"""
+    try:
+        list_files = []
+
+        # Переходим в папку с текущим регионом и получаем список архивов
+        file_list_curr = ftp_cwd(ftp, '/fcs_regions/' + reg + '/contracts/currMonth')
+        file_list_prev = ftp_cwd(ftp, '/fcs_regions/' + reg + '/contracts/prevMonth')
+        file_list = ftp_cwd(ftp, '/fcs_regions/' + reg + '/contracts')
+        for file in range(len(file_list_curr)):
+            file_list_curr[file] = 'currMonth/' + file_list_curr[file]
+
+        for file in range(len(file_list_prev)):
+            if file_list_prev[file] in file_list:
+                del file_list_prev[file]
+            else:
+                file_list_prev[file] = 'prevMonth/' + file_list_prev[file]
+
+        file_list.remove('currMonth')
+        file_list.remove('prevMonth')
+
+        file_list += file_list_curr + file_list_prev
+        del file_list_prev
+        del file_list_curr
+        for file in file_list:
+            # Пропускаем все архивы, кроме 2021 года и более
+            year = int(
+                file.replace('prevMonth/', '').replace('currMonth/', '').replace('contract_', '').replace(
+                    'control99doc_', '').replace(reg + '_', '').split('_')[0][:4])
+            if year != 2022:
+                continue
+            list_files.append(file)
+        return list_files
+    except Exception as error:
+        print(f'Error of making a list\n{error}')
