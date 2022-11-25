@@ -127,7 +127,7 @@ def get_field(parent_element, parent_name='', parent_type=False):
     return result
 
 
-def read_xml(xml_file, region_name):
+def read_xml(xml_file, region_name, archive):
     """Функция чтения файла и первичной обработки перед парсером
     :param xml_file: xml-файл в байтовом виде
     :return: Возвращает информацию для БД"""
@@ -141,6 +141,6 @@ def read_xml(xml_file, region_name):
     xml_file = re.sub(r'<cryptoSigns>[\w/+"=>< -]+<\/cryptoSigns>', '', xml_file)
     xml_object = ET.fromstring(xml_file)  # Преобразуем строку в объект
     xml_object = etree_to_dict(xml_object[0])  # Преобразуем обьект в словарь для более удобной работы
-    # print(xml_object)
     xml_object['region'] = region_name
+    xml_object['archive_name'] = archive
     return parse_xml(xml_object)

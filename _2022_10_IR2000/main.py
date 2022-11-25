@@ -6,6 +6,7 @@ import data  # импорт функций
 import parser_xml
 import sql
 import ftp
+from data import direction
 
 """Переменная для отслеживания прогресса загрузки из консоли
 0 - отображается сокращенная информация
@@ -20,24 +21,30 @@ chank_size = 500  # Размера чанка
 number_try = 0
 
 
-def archive_downloading(ftp_con, list_of_files, reg, direction='tmp/'):
+def archive_downloading(ftp_con, list_of_files, reg, dir=direction + 'tmp/'):
     """Функция скачивания архивов на локальный сервер
     :param ftp_con: Соединение
     :param list_of_files: Список файлов для скачивания
     :param reg: Имя региона
-    :param direction: Директория скачивания"""
+    :param dir: Директория скачивания"""
     try:
-        print(f'Start to download data from {reg}')
+        text = f'Start to download data from {reg}'
+        print(text)
+        with open(direction + 'logs/log.txt', 'a') as reg:
+            reg.write(f'{text}\n')
         for archive in list_of_files:
-            ftp.ftp_download(ftp_con, archive, direction)
+            ftp.ftp_download(ftp_con, archive, dir)
     except Exception as error:
         print(f'Неудачная попытка загрузки\n{error}')
+        with open(direction + 'logs/error.txt', 'a') as log:
+            log.write(f'Неудачная попытка загрузки {reg}\n{error}\n\n')
 
 
-def archive_reading(archive_file, reg, len_list_files):
+def archive_reading(archive_file, reg, table_name, len_list_files):
     """Функция чтения архивов
-    :param reg: Номер региона
     :param archive_file: Архив
+    :param reg: Номер региона
+    :param table_name: Название SQL таблицы
     :param len_list_files: Количество архивов"""
     arch_start = 1
     xml_start = 1
@@ -62,7 +69,7 @@ def archive_reading(archive_file, reg, len_list_files):
 
             try:
                 # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
-                one_object = parser_xml.read_xml(f.read(arch_file), region_name)
+                one_object = parser_xml.read_xml(f.read(arch_file), region_name, archive_file)
                 id_file = list(one_object.keys())[0]
                 all_data.update(one_object)
                 # if console_debug == 1:
@@ -73,122 +80,77 @@ def archive_reading(archive_file, reg, len_list_files):
                 chank += 1
 
                 if chank > chank_size - 1:
-                    sql.parse_sql(all_data, reg)
+                    sql.parse_sql(all_data, reg, table_name)
                     all_data = {}
                     chank = 0
             except Exception as error:
-                with open(f'logs/_log.txt', 'a') as log:
-                    log.write(f'{archive_file}\n{file}\n{error}\n\n')
+                with open(direction + 'logs/error.txt', 'a') as log:
+                    log.write(f'Ошибка чтения\n{archive_file}\n{arch_file}\n{error}\n\n')
                 error_files += 1
                 continue
 
 
 try:
+    with open(direction + 'logs/log.txt', 'w') as f:
+        f.write(f'Процесс\n')
+    with open(direction + 'logs/regions.txt', 'w') as f:
+        f.write(f'Обработанные регионы\n')
+    with open(direction + 'logs/error.txt', 'w') as f:
+        f.write(f'Запись ошибок\n')
     # Перебор регионов
     for region in data.all_regions:
-        # Проверка на наличие файлов в скачанном
-        # if os.listdir('tmp') and number_try < 5:
-        #     number_try += 1
-        #     try:
-        #         region_name = os.listdir('tmp')[0].split('_')[1]
-        #         for name in data.region_names:
-        #             if region_name in name:
-        #                 region_name = name
-        #                 break
-        #         region_temp = data.region_names.get(region_name, 0)
-        #         print(f'Дополнительная попытка №{number_try}')
-        #         print(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"), region_temp, region_name, 'START')
-        #         list_files_local = dict()
-        #         for file in os.listdir('tmp'):
-        #             list_files_local[file] = os.stat(f'tmp/{file}')[6]
-        #         ftp_connect = ftp.ftp_connect()
-        #         if ftp_connect:
-        #             file_list = ftp.ftp_cwd(ftp_connect, '/fcs_regions/' + region_name + '/contracts')
-        #             file_list_server = set(ftp.ftp_make_list_files(ftp_connect, region_name))
-        #             list_of_ftp_files = ftp.ftp_list_of_download(ftp_connect, file_list_server, list_files_local)
-        #             try:
-        #                 archive_downloading(ftp_connect, list_of_ftp_files, region_name)
-        #                 download_files = os.listdir('tmp')
-        #                 while len(file_list_server) > len(download_files):
-        #                     file_list_local = dict()
-        #                     for file in os.listdir('tmp'):
-        #                         file_list_local[file] = os.stat(f'tmp/{file}')[6]
-        #                     list_of_ftp_files = ftp.ftp_list_of_download(ftp_connect, file_list_server, file_list_local)
-        #                     archive_downloading(ftp_connect, list_of_ftp_files, region_name)
-        #                     download_files = os.listdir('tmp')
-        #             except Exception as error:
-        #                 print(f'Archive error\n{error}')
-        #             ftp_connect.close()
-        #             list_files = os.listdir('tmp')
-        #             print(f'Download complete: {len(list_files)} archives')
-        #             chank = 0
-        #             all_files = 0
-        #             true_files = 0
-        #             false_files = 0
-        #             error_files = 0
-        #             # Перебор архивов
-        #             for tmp_file in list_files:
-        #                 archive_reading('tmp/' + tmp_file, region_temp, len(list_files))
-        #
-        #             # Добавляем оставшиеся записи в БД после обработки региона
-        #             sql.parse_sql(all_data, region_temp)
-        #             all_data = {}
-        #             data_contracts = []
-        #             chank = 0
-        #
-        #             # Получаем список файлов временной папки и удаляем их
-        #             for file in os.listdir('tmp'):
-        #                 os.remove('tmp/' + file)
-        #
-        #             print(f'All: {all_files} status: {all_files == true_files + false_files} True: {true_files} '
-        #                   f'False: {false_files}')
-        #             print(f'Errors: {error_files} files')
-        #             print(f'{region_temp} {region_name} STOP')
-        #     except Exception as error:
-        #         print(error)
-        # else:
-        #     number_try = 0
-        #     for file in os.listdir('tmp'):
-        #         os.remove('tmp/' + file)
-        region = '94'
-        for file in os.listdir('tmp'):
-            os.remove('tmp/' + file)
+        for file in os.listdir(direction + 'tmp'):
+            os.remove(direction + 'tmp/' + file)
         region_name = data.regions(region)  # Получаем название региона по его индексу
-        with open(f'logs/reg.txt', 'a') as reg:
+        table_name = data.table_name(region)  # Получаем название SQL таблицы по индексу региона
+        with open(direction + 'logs/regions.txt', 'a') as reg:
             reg.write(f'{region_name}\n')
         arch_start = 1
 
         # Проверка полученного региона на возможные ошибки
         if region_name == 0:
-            print(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"), f'Региона с кодом {region} не существует')
+            text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Региона с кодом {region} не существует'
+            print(text)
+            with open(direction + 'logs/log.txt', 'a') as reg:
+                reg.write(f'{text}\n')
             continue
 
-        print(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"), region, region_name, 'START')
+        text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} {region} {region_name} START'
+        print(text)
+        with open(direction + 'logs/log.txt', 'a') as reg:
+            reg.write(f'{text}\n')
 
         # Устанавливаем соединение и скачиваем архивы на локальный сервер
         ftp_connect = ftp.ftp_connect()
         if ftp_connect:
             list_files = ftp.ftp_make_list_files(ftp_connect, region_name)
+            list_files = ftp.ftp_list_of_new(list_files, table_name)
             download_files = []
             number_try = 0
             while len(list_files) > len(download_files):
                 number_try += 1
                 list_files_local = dict()
-                for file in os.listdir('tmp'):
-                    list_files_local[file] = os.stat(f'tmp/{file}')[6]
+                for file in os.listdir(direction + 'tmp'):
+                    list_files_local[file] = os.stat(f'{direction}tmp/{file}')[6]
                 list_of_files = ftp.ftp_list_of_download(ftp_connect, set(list_files), list_files_local)
                 archive_downloading(ftp_connect, list_of_files, region_name)
-                download_files = os.listdir('tmp')
+                download_files = os.listdir(direction + 'tmp')
                 if number_try > 5:
                     break
             ftp_connect.close()  # Закрываем соединение
         else:
-            print(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"), 'Не удалось установить связь с FTP-сервером')
+            text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Не удалось установить связь с FTP-сервером'
+            print(text)
+            with open(direction + 'logs/log.txt', 'a') as reg:
+                reg.write(f'{text}\n')
             continue
         # if console_debug == 1:
         #     print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
-        print(f'Download complete: {len(download_files)} archives')
-        list_files = os.listdir('tmp')
+        text = f'Download complete: {len(download_files)} archives'
+        print(text)
+        with open(direction + 'logs/log.txt', 'a') as reg:
+            reg.write(f'{text}\n')
+        list_files = os.listdir(direction + 'tmp')
         chank = 0
         all_files = 0
         true_files = 0
@@ -198,27 +160,33 @@ try:
         # Перебор архивов
         for tmp_file in list_files:
             try:
-                archive_reading('tmp/' + tmp_file, region, len(list_files))
+                archive_reading(direction + 'tmp/' + tmp_file, region, table_name, len(list_files))
             except Exception as error:
-                print(f'Archive error\n{error}')
+                with open(direction + 'logs/error.txt', 'a') as log:
+                    log.write(f'Archive error\n{tmp_file}\n{error}\n\n')
 
         if console_debug == 1:
             print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
 
         # Добавляем оставшиеся записи в БД после обработки региона
-        sql.parse_sql(all_data, region)
+        sql.parse_sql(all_data, region, table_name)
         all_data = {}
         data_contracts = []
         chank = 0
 
         # Получаем список файлов временной папки и удаляем их
-        for file in os.listdir('tmp'):
-            os.remove('tmp/' + file)
+        for file in os.listdir(direction + 'tmp'):
+            os.remove(direction + 'tmp/' + file)
 
-        print(f'All: {all_files} status: {all_files == true_files + false_files} True: {true_files} '
-              f'False: {false_files}')
-        print(f'Errors: {error_files} files')
-        print(f'{region} {region_name} STOP')
-        break
+        text = f'''All: {all_files} status: {all_files == true_files + false_files}
+        True: {true_files} False: {false_files}\nErrors: {error_files} files\n{region} {region_name} STOP'''
+        print(text)
+        with open(direction + 'logs/log.txt', 'a') as reg:
+            reg.write(f'{text}\n')
 except Exception as e:
-    print(f'!!! Ошибка в выполнении скрипта !!!\n{e}')
+    text = f'!!! Ошибка в выполнении скрипта !!!\n{e}'
+    print(text)
+    with open(direction + 'logs/log.txt', 'a') as reg:
+        reg.write(text)
+    with open('/home/parser/contracts_new/logs/error.txt', 'a') as log:
+        log.write(text)

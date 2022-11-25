@@ -5,21 +5,21 @@ from data import config
 
 
 def db_connect():
-    """Соединение с базой данных"""
+    """Connection to database"""
     return mysql.connect(**config)
 
 
 def create_db():
-    """Функция создания базы данных"""
+    """Function of creating a database"""
     try:
         connection = mysql.connect(
             user=config['user'],
             password=config['password'],
             host=config['host'],
-            port=config['port']
+            # port=config['port']
         )
         with connection.cursor() as cursor:
-            query = f'CREATE DATABASE {config["database"]}'
+            query = f'CREATE DATABASE {config["database"]} COLLATE utf8_general_ci'
             cursor.execute(query)
         connection.close()
         return True

@@ -1,4 +1,6 @@
 from ftplib import FTP
+from data import direction
+from sql import get_contracts_numbers
 
 
 def ftp_connect():
@@ -10,26 +12,29 @@ def ftp_connect():
             ftp = FTP(host='ftp.zakupki.gov.ru', user='free', passwd='free')  # Устанавливаем соединение
             break
         except Exception as e:
-            print(f'Неудачная попытка соединения #{i+1}\n{e}')
+            text = f'Неудачная попытка соединения #{i+1}\n{e}'
+            print(text)
+            with open(direction + 'logs/log.txt', 'a') as reg:
+                reg.write(text)
             continue
     return ftp
 
 
-def ftp_cwd(ftp, direction):
+def ftp_cwd(ftp, dir):
     """Функция получения списка файлов и папок в директории на FTP
     :param ftp: FTP-соединение
-    :param direction: Директория, из которой нужно получить список файлов и папок
+    :param dir: Директория, из которой нужно получить список файлов и папок
     :return: Возвращает список файлов и папок"""
-    ftp.cwd(direction)  # Переходим в нужную директорию
+    ftp.cwd(dir)  # Переходим в нужную директорию
     return ftp.nlst()
 
 
 def ftp_list_of_download(ftp, server_files, local_files):
-    """Функция получения списка незагруженных файлов
+    """Функция создания списка незагруженных файлов
     :param ftp: FTP-соединение
     :param server_files: Файлы на сервере
     :param local_files: Файлы скачанные
-    :return: Список файлов для загрузки"""
+    :return: Возвращает список файлов для скачивания"""
     list_files = set()
     files = dict()
     for file in local_files:
@@ -49,7 +54,28 @@ def ftp_list_of_download(ftp, server_files, local_files):
     return server_files - list_files
 
 
-def ftp_download(ftp, file, path_tmp='tmp/'):
+def ftp_list_of_new(server_files, table_name):
+    """Функция создания списка новых файлов
+    :param server_files: Файлы на сервере
+    :param table_name: Название SQL таблицы
+    :return: Возвращает список файлов для скачивания"""
+    oldest_archive = ''
+    new_list_files = []
+    contract_numbers = get_contracts_numbers(table_name)
+    for contract in contract_numbers:
+        tmp_data = contract_numbers[contract]['Название_архива']
+        if oldest_archive < tmp_data:
+            oldest_archive = tmp_data
+    if not oldest_archive:
+        return server_files
+    publish_date = oldest_archive.split('/')[-1]
+    for archive in server_files:
+        if publish_date < archive.replace('prevMonth/', '').replace('currMonth/', ''):
+            new_list_files.append(archive)
+    return new_list_files
+
+
+def ftp_download(ftp, file, path_tmp=direction + 'tmp/'):
     """Функция скачивания файла с FTP
     :param ftp: FTP-соединение
     :param file: Путь до файла, относительно текущей директории (устонавливается перед запуском функции)
@@ -97,12 +123,14 @@ def ftp_make_list_files(ftp, reg):
         del file_list_curr
         for file in file_list:
             # Пропускаем все архивы, кроме 2021 года и более
-            year = int(
-                file.replace('prevMonth/', '').replace('currMonth/', '').replace('contract_', '').replace(
-                    'control99doc_', '').replace(reg + '_', '').split('_')[0][:4])
-            if year != 2022:
-                continue
-            list_files.append(file)
+            year = file.replace('prevMonth/', '').replace('currMonth/', '').replace('contract_', '').replace(
+                    'control99doc_', '').replace(reg + '_', '').split('_')[0][:4]
+            if year.isdigit():
+                year = int(year)
+                if year != 2022:
+                    continue
+                list_files.append(file)
         return list_files
     except Exception as error:
-        print(f'Error of making a list\n{error}')
+        with open(direction + 'logs/error.txt', 'a') as log:
+            log.write(f'Error of making a list (ftp)\n{reg}\n{error}\n\n')

@@ -189,13 +189,19 @@ all_regions = northwestern_fd | central_fd | volga_fd | southern_fd | north_cauc
               far_eastern_fd | crimean_fd
 
 config = {
-        'user': 'root',
-        'password': 'root',
-        'host': 'localhost',
-        'port': '3306',
-        'database': 'contracts_v2',
+        'user': 'root1',
+        'password': '94b10644b610480e9ef334779068602df3824b11fd7d3261',
+        'host': '134.0.115.33',
+        'database': 'contracts_new',
         'raise_on_warnings': True
     }       # Данные для подключения к БД
+# config = {
+#         'user': 'root',
+#         'password': 'root',
+#         'host': 'localhost',
+#         'database': 'contracts',
+#         'raise_on_warnings': True
+#     }       # Данные для подключения к БД
 field_links = {
     'id': 'id',
     'regNum': 'regNum',
@@ -402,7 +408,6 @@ field_links = {
     'productsproductvaluequalityDescription': 'Объекты_закуп_Характеристика_позиции_Описание',
     'productsproductvolumeSpecifyingMethod': 'Объекты_закуп_Характеристика_позиции_Значение',
     'productsproductvolumeTextForm': 'Объекты_закуп_Характеристика_позиции_Значение',
-    'productsquantityUndefined': 'Объекты_закуп_Невозможно_указать_сведения_о_количестве',
     'protocolDate': 'Дата_подведения_результатов_определения_поставщ',
     'quantityContractStages': 'Количество_этапов_кнтркта',
     'receiptDocumentsattachmentdocDescription': 'Док_подтверждающие_приемку_товара_Описание',
@@ -437,7 +442,8 @@ field_links = {
     'terminationpaid': 'Инфо_о_расторжении_кнтркта_Фактически_оплачено',
     'terminationreasonInfo': 'Инфо_о_расторжении_кнтркта_Причина_расторжения_кнтркта',
     'terminationreasonname': 'Инфо_о_расторжении_кнтркта_Основан_расторжения_кнтркта',
-    'terminationterminationDate': 'Инфо_о_расторжении_кнтркта_Дата_расторжения_кнтркта'}  # Импортируемые строки в БД
+    'terminationterminationDate': 'Инфо_о_расторжении_кнтркта_Дата_расторжения_кнтркта',
+    'archive_name': 'Название_архива'}  # Импортируемые строки в БД
 columns = [
     'id',
     'regNum',
@@ -601,7 +607,6 @@ columns = [
     'Объекты_закуп_Стоимость_в_руб_экв',
     'Объекты_закуп_Торговое_наим_препарата',
     'Объекты_закуп_Тип_обекта',
-    'Объекты_закуп_Невозможно_указать_сведения_о_количестве',
     'Дата_подведения_результатов_определения_поставщ',
     'Количество_этапов_кнтркта',
     'Док_подтверждающие_приемку_товара_Описание',
@@ -636,7 +641,10 @@ columns = [
     'Инфо_о_расторжении_кнтркта_Фактически_оплачено',
     'Инфо_о_расторжении_кнтркта_Причина_расторжения_кнтркта',
     'Инфо_о_расторжении_кнтркта_Основан_расторжения_кнтркта',
-    'Инфо_о_расторжении_кнтркта_Дата_расторжения_кнтркта']      # Наименования столбцов в таблицах БД
+    'Инфо_о_расторжении_кнтркта_Дата_расторжения_кнтркта',
+    'Название_архива']      # Наименования столбцов в таблицах БД
+direction = '/home/parser/contracts_new/'  # Рабочая директория
+# direction = ''
 
 
 def regions(code):
@@ -646,64 +654,26 @@ def regions(code):
     return region.get(code, 0)
 
 
-# def data_downloading(ftp_con, list_of_files, reg, direction='tmp/'):
-#     """Функция скачивания архивов на локальный сервер
-#     :param ftp_con: Соединение
-#     :param list_of_files: Список файлов для скачивания
-#     :param reg: Имя региона
-#     :param direction: Директория скачивания"""
-#     try:
-#         print(f'Start to download data from {reg}')
-#         for archive in list_of_files:
-#             ftp.ftp_download(ftp_con, archive, direction)
-#     except Exception as error:
-#         print(f'Неудачная попытка загрузки\n{error}')
-#
-#
-# def data_reading(archive_file, reg, len_list_files):
-#     """Функция чтения архивов
-#     :param reg: Номер региона
-#     :param archive_file: Архив
-#     :param len_list_files: Количество архивов"""
-#     arch_start = 1
-#     xml_start = 1
-#     global all_files
-#     global false_files
-#     global true_files
-#     global error_files
-#     global all_data
-#     global chank
-#     global chank_size
-#     with zipfile.ZipFile(archive_file, 'r') as f:
-#         all_files += len(f.namelist())
-#
-#         # Перебор файлов в архиве
-#         for arch_file in f.namelist():
-#             # Отсеиваем лишние файлы
-#             if 'sig' in arch_file or 'Available' in arch_file or 'Cancel' in arch_file:
-#                 false_files += 1
-#                 continue
-#             true_files += 1
-#
-#             try:
-#                 # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
-#                 one_object = parser_xml.read_xml(f.read(arch_file))
-#                 id_file = list(one_object.keys())[0]
-#                 all_data.update(one_object)
-#                 # if console_debug == 1:
-#                 # print('Parsing xml ' + str(round(
-#                 #     xml_start * (arch_start * 100 / len_list_files) / len(f.namelist()))) + '%',
-#                 #       end='\n')
-#                 xml_start += 1
-#                 chank += 1
-#
-#                 if chank > chank_size - 1:
-#                     sql.parse_sql(all_data, reg)
-#                     all_data = {}
-#                     chank = 0
-#             except Exception as error:
-#                 with open(f'logs/_log.txt', 'a') as log:
-#                     log.write(f'{archive_file}\n{file}\n{error}\n\n')
-#                 error_files += 1
-#                 continue
-
+def table_name(region):
+    """Функция определения названия таблицы по номеру региона
+    :param region: Код региона
+    :return: Возвращает название таблицы"""
+    if region in ['78', '47', '53', '60', '10', '29', '11', '35', '51', '83', '39']:
+        return 'northwestern_fd'
+    if region in ['32', '33', '37', '40', '44', '57', '62', '67', '69', '71', '76', '31', '36', '46', '48', '68']:
+        return 'central_fd'
+    if region in ['52', '43', '12', '13', '21', '58', '73', '64', '63', '56', '02', '16', '18', '59']:
+        return 'volga_fd'
+    if region in ['08', '34', '30', '01', '61', '23']:
+        return 'southern_fd'
+    if region in ['26', '15', '09', '07', '20', '06', '05']:
+        return 'north_caucasian_fd'
+    if region in ['66', '74', '45', '72', '89', '86']:
+        return 'ural_fd'
+    if region in ['04', '22', '54', '70', '42', '55', '19', '17', '24', '38', '03', '75']:
+        return 'siberian_fd'
+    if region in ['14', '79', '87', '25', '27', '28', '41', '49', '65']:
+        return 'far_eastern_fd'
+    if region in ['77', '50']:
+        return 'moscow_and_moscow_region'
+    return 'crimean_fd'
