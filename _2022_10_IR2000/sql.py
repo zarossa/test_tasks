@@ -12,14 +12,15 @@ def db_connect():
     return mysql.connect(**config)
 
 
-def get_contracts_numbers(table):
+def get_contracts_numbers(table, region_name):
     """Функция получения списка контрактов
     :param table: Имя таблицы
+    :param region_name: Имя региона
     :return: Список контрактов"""
     try:
         connection = db_connect()
         with connection.cursor() as cursor:
-            query = f"SELECT id, regNum, publish_date, Название_архива FROM {table}"
+            query = f"SELECT id, regNum, publish_date, Название_архива FROM {table} WHERE Регион = \'{region_name}\'"
             cursor.execute(query)
             ids = cursor.fetchall()
         connection.close()

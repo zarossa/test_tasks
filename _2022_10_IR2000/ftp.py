@@ -54,14 +54,14 @@ def ftp_list_of_download(ftp, server_files, local_files):
     return server_files - list_files
 
 
-def ftp_list_of_new(server_files, table_name):
+def ftp_list_of_new(server_files, table_name, region_name):
     """Функция создания списка новых файлов
     :param server_files: Файлы на сервере
     :param table_name: Название SQL таблицы
     :return: Возвращает список файлов для скачивания"""
     oldest_archive = ''
     new_list_files = []
-    contract_numbers = get_contracts_numbers(table_name)
+    contract_numbers = get_contracts_numbers(table_name, region_name)
     for contract in contract_numbers:
         tmp_data = contract_numbers[contract]['Название_архива']
         if oldest_archive < tmp_data:

@@ -127,7 +127,7 @@ try:
             ftp_connect = ftp.ftp_connect()
             if ftp_connect:
                 list_files = ftp.ftp_make_list_files(ftp_connect, region_name)
-                list_files = ftp.ftp_list_of_new(list_files, table_name)
+                list_files = ftp.ftp_list_of_new(list_files, table_name, region_name)
                 download_files = []
                 number_try = 0
                 while len(list_files) > len(download_files):
@@ -194,6 +194,10 @@ try:
                 log.write(text)
             if ioe.errno == errno.EPIPE:
                 pass
+    text = 'Скрипт закончил работу'
+    print(text)
+    with open(direction + 'logs/log.txt', 'a') as reg:
+        reg.write(text)
 except Exception as e:
     text = f'!!! Ошибка в выполнении скрипта !!!\n{e}'
     print(text)
