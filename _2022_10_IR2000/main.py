@@ -1,6 +1,8 @@
 import datetime  # импорт стандартных библиотек
 import os
 import zipfile
+import sys
+import errno
 
 import data  # импорт функций
 import parser_xml
@@ -99,90 +101,99 @@ try:
         f.write(f'Запись ошибок\n')
     # Перебор регионов
     for region in data.all_regions:
-        for file in os.listdir(direction + 'tmp'):
-            os.remove(direction + 'tmp/' + file)
-        region_name = data.regions(region)  # Получаем название региона по его индексу
-        table_name = data.table_name(region)  # Получаем название SQL таблицы по индексу региона
-        with open(direction + 'logs/regions.txt', 'a') as reg:
-            reg.write(f'{region_name}\n')
-        arch_start = 1
+        try:
+            for file in os.listdir(direction + 'tmp'):
+                os.remove(direction + 'tmp/' + file)
+            region_name = data.regions(region)  # Получаем название региона по его индексу
+            table_name = data.table_name(region)  # Получаем название SQL таблицы по индексу региона
+            with open(direction + 'logs/regions.txt', 'a') as reg:
+                reg.write(f'{region_name}\n')
+            arch_start = 1
 
-        # Проверка полученного региона на возможные ошибки
-        if region_name == 0:
-            text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Региона с кодом {region} не существует'
+            # Проверка полученного региона на возможные ошибки
+            if region_name == 0:
+                text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Региона с кодом {region} не существует'
+                print(text)
+                with open(direction + 'logs/log.txt', 'a') as reg:
+                    reg.write(f'{text}\n')
+                continue
+
+            text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} {region} {region_name} START'
             print(text)
             with open(direction + 'logs/log.txt', 'a') as reg:
                 reg.write(f'{text}\n')
-            continue
 
-        text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} {region} {region_name} START'
-        print(text)
-        with open(direction + 'logs/log.txt', 'a') as reg:
-            reg.write(f'{text}\n')
-
-        # Устанавливаем соединение и скачиваем архивы на локальный сервер
-        ftp_connect = ftp.ftp_connect()
-        if ftp_connect:
-            list_files = ftp.ftp_make_list_files(ftp_connect, region_name)
-            list_files = ftp.ftp_list_of_new(list_files, table_name)
-            download_files = []
-            number_try = 0
-            while len(list_files) > len(download_files):
-                number_try += 1
-                list_files_local = dict()
-                for file in os.listdir(direction + 'tmp'):
-                    list_files_local[file] = os.stat(f'{direction}tmp/{file}')[6]
-                list_of_files = ftp.ftp_list_of_download(ftp_connect, set(list_files), list_files_local)
-                archive_downloading(ftp_connect, list_of_files, region_name)
-                download_files = os.listdir(direction + 'tmp')
-                if number_try > 5:
-                    break
-            ftp_connect.close()  # Закрываем соединение
-        else:
-            text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Не удалось установить связь с FTP-сервером'
+            # Устанавливаем соединение и скачиваем архивы на локальный сервер
+            ftp_connect = ftp.ftp_connect()
+            if ftp_connect:
+                list_files = ftp.ftp_make_list_files(ftp_connect, region_name)
+                list_files = ftp.ftp_list_of_new(list_files, table_name)
+                download_files = []
+                number_try = 0
+                while len(list_files) > len(download_files):
+                    number_try += 1
+                    list_files_local = dict()
+                    for file in os.listdir(direction + 'tmp'):
+                        list_files_local[file] = os.stat(f'{direction}tmp/{file}')[6]
+                    list_of_files = ftp.ftp_list_of_download(ftp_connect, set(list_files), list_files_local)
+                    archive_downloading(ftp_connect, list_of_files, region_name)
+                    download_files = os.listdir(direction + 'tmp')
+                    if number_try > 5:
+                        break
+                ftp_connect.close()  # Закрываем соединение
+            else:
+                text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} Не удалось установить связь с FTP-сервером'
+                print(text)
+                with open(direction + 'logs/log.txt', 'a') as reg:
+                    reg.write(f'{text}\n')
+                continue
+            # if console_debug == 1:
+            #     print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
+            text = f'Download complete: {len(download_files)} archives'
             print(text)
             with open(direction + 'logs/log.txt', 'a') as reg:
                 reg.write(f'{text}\n')
-            continue
-        # if console_debug == 1:
-        #     print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
-        text = f'Download complete: {len(download_files)} archives'
-        print(text)
-        with open(direction + 'logs/log.txt', 'a') as reg:
-            reg.write(f'{text}\n')
-        list_files = os.listdir(direction + 'tmp')
-        chank = 0
-        all_files = 0
-        true_files = 0
-        false_files = 0
-        error_files = 0
+            list_files = os.listdir(direction + 'tmp')
+            chank = 0
+            all_files = 0
+            true_files = 0
+            false_files = 0
+            error_files = 0
 
-        # Перебор архивов
-        for tmp_file in list_files:
-            try:
-                archive_reading(direction + 'tmp/' + tmp_file, region, table_name, len(list_files))
-            except Exception as error:
-                with open(direction + 'logs/error.txt', 'a') as log:
-                    log.write(f'Archive error\n{tmp_file}\n{error}\n\n')
+            # Перебор архивов
+            for tmp_file in list_files:
+                try:
+                    archive_reading(direction + 'tmp/' + tmp_file, region, table_name, len(list_files))
+                except Exception as error:
+                    with open(direction + 'logs/error.txt', 'a') as log:
+                        log.write(f'Archive error\n{tmp_file}\n{error}\n\n')
 
-        if console_debug == 1:
-            print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
+            if console_debug == 1:
+                print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
 
-        # Добавляем оставшиеся записи в БД после обработки региона
-        sql.parse_sql(all_data, region, table_name)
-        all_data = {}
-        data_contracts = []
-        chank = 0
+            # Добавляем оставшиеся записи в БД после обработки региона
+            sql.parse_sql(all_data, region, table_name)
+            all_data = {}
+            data_contracts = []
+            chank = 0
 
-        # Получаем список файлов временной папки и удаляем их
-        for file in os.listdir(direction + 'tmp'):
-            os.remove(direction + 'tmp/' + file)
+            # Получаем список файлов временной папки и удаляем их
+            for file in os.listdir(direction + 'tmp'):
+                os.remove(direction + 'tmp/' + file)
 
-        text = f'''All: {all_files} status: {all_files == true_files + false_files}
-        True: {true_files} False: {false_files}\nErrors: {error_files} files\n{region} {region_name} STOP'''
-        print(text)
-        with open(direction + 'logs/log.txt', 'a') as reg:
-            reg.write(f'{text}\n')
+            text = f'''All: {all_files} status: {all_files == true_files + false_files}
+            True: {true_files} False: {false_files}\nErrors: {error_files} files\n{region} {region_name} STOP'''
+            print(text)
+            with open(direction + 'logs/log.txt', 'a') as reg:
+                reg.write(f'{text}\n')
+        except IOError as ioe:
+            text = f'Ошибка ввода/вывода!\n{ioe}'
+            with open(direction + 'logs/log.txt', 'a') as reg:
+                reg.write(text)
+            with open('/home/parser/contracts_new/logs/error.txt', 'a') as log:
+                log.write(text)
+            if ioe.errno == errno.EPIPE:
+                pass
 except Exception as e:
     text = f'!!! Ошибка в выполнении скрипта !!!\n{e}'
     print(text)
