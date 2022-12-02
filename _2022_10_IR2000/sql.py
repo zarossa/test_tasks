@@ -20,7 +20,7 @@ def get_contracts_numbers(table, region_name):
     try:
         connection = db_connect()
         with connection.cursor() as cursor:
-            query = f"SELECT id, regNum, publish_date, Название_архива FROM {table} WHERE Регион = \'{region_name}\'"
+            query = f"SELECT id, regNum, publish_date, Название_архива FROM {table} WHERE Регион = '{region_name}'"
             cursor.execute(query)
             ids = cursor.fetchall()
         connection.close()
@@ -51,38 +51,63 @@ def insert_values(table, columns, values):
     except Error as e:
         with open(direction + 'logs/error.txt', 'a') as log:
             log.write(f'The error was occurred at the function insert_values:\n{table}\n{e}\n\n')
+        with open(direction + 'logs/broken.txt', 'r') as log:
+            log.write(f'{table}\n{e}\n{columns}\n{values}\n\n')
 
 
-def parse_sql(data, region, table_name):
+# def insert_big_values(table, columns, values, values2, values3, values4):
+#     """Функция добавления записей в таблицу
+#     :param table: Имя таблицы
+#     :param columns: Перечень имен столбцов в виде списка
+#     :param values: Данные для записи в виде списка кортежей
+#     :param values2: Данные для записи в виде списка кортежей
+#     :param values3: Данные для записи в виде списка кортежей
+#     :param values4: Данные для записи в виде списка кортежей"""
+#     try:
+#         columns1 = columns[:50]
+#         columns2 = columns[50:100]
+#         columns3 = columns[100:150]
+#         columns4 = columns[150:]
+#         connection = db_connect()
+#         val1 = re.sub(r'\$s', '%s', ', '.join(['IFNULL($s, DEFAULT(`%s`))'] * len(columns1)) % tuple(columns1))
+#         columns1 = ', '.join(columns1)
+#         query1 = f"INSERT INTO {table} ({columns1}) VALUES ({val1})"
+#
+#         columns2 = [f"`{column}` = IFNULL(%s, DEFAULT(`{column}`))" for column in columns2]
+#         columns2 = ', '.join(columns2)
+#         query2 = f"UPDATE {table} SET {columns2} WHERE `id` = %s"
+#
+#         columns3 = [f"`{column}` = IFNULL(%s, DEFAULT(`{column}`))" for column in columns3]
+#         columns3 = ', '.join(columns3)
+#         query3 = f"UPDATE {table} SET {columns3} WHERE `id` = %s"
+#
+#         columns4 = [f"`{column}` = IFNULL(%s, DEFAULT(`{column}`))" for column in columns4]
+#         columns4 = ', '.join(columns4)
+#         query4 = f"UPDATE {table} SET {columns4} WHERE `id` = %s"
+#         with connection.cursor() as cursor:
+#             cursor.executemany(query1, values)
+#             connection.commit()
+#             cursor.executemany(query2, values2)
+#             connection.commit()
+#             cursor.executemany(query3, values3)
+#             connection.commit()
+#             cursor.executemany(query4, values4)
+#             connection.commit()
+#         connection.close()
+#         return True
+#     except Error as e:
+#         with open(direction + 'logs/error.txt', 'a') as log:
+#             log.write(f'The error was occurred at the function insert_big_values:\n{table}\n{e}\n\n')
+
+
+def parse_sql(data, region, region_name, table_name):
     """Функция парсера БД"""
     # global data.fieldsLinks
     # columns_to_add = []
     preval = {}
     values = []
-    # updates = []
-    # В зависимости от региона, получаем таблицу для записи
-    # if region in ['78', '47', '53', '60', '10', '29', '11', '35', '51', '83', '39']:
-    #     table_name = 'northwestern_fd'
-    # elif region in ['32', '33', '37', '40', '44', '57', '62', '67', '69', '71', '76', '31', '36', '46', '48', '68']:
-    #     table_name = 'central_fd'
-    # elif region in ['52', '43', '12', '13', '21', '58', '73', '64', '63', '56', '02', '16', '18', '59']:
-    #     table_name = 'volga_fd'
-    # elif region in ['08', '34', '30', '01', '61', '23']:
-    #     table_name = 'southern_fd'
-    # elif region in ['26', '15', '09', '07', '20', '06', '05']:
-    #     table_name = 'north_caucasian_fd'
-    # elif region in ['66', '74', '45', '72', '89', '86']:
-    #     table_name = 'ural_fd'
-    # elif region in ['04', '22', '54', '70', '42', '55', '19', '17', '24', '38', '03', '75']:
-    #     table_name = 'siberian_fd'
-    # elif region in ['14', '79', '87', '25', '27', '28', '41', '49', '65']:
-    #     table_name = 'far_eastern_fd'
-    # elif region in ['77', '50']:
-    #     table_name = 'moscow_and_moscow_region'
-    # else:
-    #     table_name = 'crimean_fd'
 
-    contract_numbers = get_contracts_numbers(table_name)
+    contract_numbers = get_contracts_numbers(table_name, region_name)
     # Формируем столбцы для добавления в БД
     # !!!Внимание!!! Проверка столбцов чувствительна к регистру. EndDate не равно endDate.
     for notif in data:

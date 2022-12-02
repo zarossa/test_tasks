@@ -67,7 +67,10 @@ def parse_xml(xml_object):
         for child in xml_object:
             if isinstance(xml_object[child], str):  # Если дочерний элемент - строка, то делаем запись без обработки
                 result[file_id][child] = xml_object[child]
-
+            elif isinstance(xml_object[child], list):
+                temp = {child: xml_object[child]}
+                res = get_field(temp, child)
+                result[file_id].update(res)
             else:  # Если дочерний элемент - это не строка, то делаем обработку перед записью
                 res = get_field(xml_object[child], child)  # Вызываем рекурсивную функцию для перебора дочерних эл-тов
                 result[file_id].update(res)  # Результат добавляем в основной массив

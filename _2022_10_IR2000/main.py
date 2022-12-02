@@ -18,7 +18,7 @@ from data import direction
 console_debug = 0
 
 all_data = {}  # Массив для записи данных
-data_contracts = []  # Массив для глобального хранения ID извещений
+all_long_data = {}
 chank_size = 500  # Размера чанка
 number_try = 0
 
@@ -51,13 +51,16 @@ def archive_reading(archive_file, reg, table_name, len_list_files):
     arch_start = 1
     xml_start = 1
     global all_files
+    global all_long_data
     global false_files
     global true_files
     global error_files
     global all_data
     global chank
+    global chank_long
     global chank_size
     region_name = data.regions(reg)
+    # print(f'read {archive_file}')
     with zipfile.ZipFile(archive_file, 'r') as f:
         all_files += len(f.namelist())
 
@@ -68,23 +71,34 @@ def archive_reading(archive_file, reg, table_name, len_list_files):
                 false_files += 1
                 continue
             true_files += 1
+            len_files = 0
 
             try:
                 # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
                 one_object = parser_xml.read_xml(f.read(arch_file), region_name, archive_file)
                 id_file = list(one_object.keys())[0]
+                # for i in one_object[id_file]:
+                #     len_files += len(one_object[id_file][i])
+                # if len_files < 8000:
                 all_data.update(one_object)
+                chank += 1
+                # else:
+                #     all_long_data.update(one_object)
+                #     chank_long += 1
                 # if console_debug == 1:
                 # print('Parsing xml ' + str(round(
                 #     xml_start * (arch_start * 100 / len_list_files) / len(f.namelist()))) + '%',
                 #       end='\n')
                 xml_start += 1
-                chank += 1
 
                 if chank > chank_size - 1:
-                    sql.parse_sql(all_data, reg, table_name)
+                    sql.parse_sql(all_data, reg, region_name, table_name)
                     all_data = {}
                     chank = 0
+                # if chank_long > 0:  #chank_size // 10 - 1:
+                #     sql.parse_sql(all_long_data, reg, region_name, table_name, True)
+                #     all_long_data = {}
+                #     chank_long = 0
             except Exception as error:
                 with open(direction + 'logs/error.txt', 'a') as log:
                     log.write(f'Ошибка чтения\n{archive_file}\n{arch_file}\n{error}\n\n')
@@ -155,6 +169,7 @@ try:
                 reg.write(f'{text}\n')
             list_files = os.listdir(direction + 'tmp')
             chank = 0
+            chank_long = 0
             all_files = 0
             true_files = 0
             false_files = 0
@@ -172,10 +187,13 @@ try:
                 print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
 
             # Добавляем оставшиеся записи в БД после обработки региона
-            sql.parse_sql(all_data, region, table_name)
+            sql.parse_sql(all_data, region, region_name, table_name)
+            # sql.parse_sql(all_long_data, region, region_name, table_name, True)
             all_data = {}
-            data_contracts = []
+            all_long_data = {}
+
             chank = 0
+            chank_long = 0
 
             # Получаем список файлов временной папки и удаляем их
             for file in os.listdir(direction + 'tmp'):
@@ -190,11 +208,12 @@ try:
             text = f'Ошибка ввода/вывода!\n{ioe}'
             with open(direction + 'logs/log.txt', 'a') as reg:
                 reg.write(text)
-            with open('/home/parser/contracts_new/logs/error.txt', 'a') as log:
+            with open(direction + 'logs/error.txt', 'a') as log:
                 log.write(text)
             if ioe.errno == errno.EPIPE:
                 pass
-    text = 'Скрипт закончил работу'
+
+    text = 'Скрипт закончил работу\n'
     print(text)
     with open(direction + 'logs/log.txt', 'a') as reg:
         reg.write(text)
@@ -203,5 +222,5 @@ except Exception as e:
     print(text)
     with open(direction + 'logs/log.txt', 'a') as reg:
         reg.write(text)
-    with open('/home/parser/contracts_new/logs/error.txt', 'a') as log:
+    with open(direction + 'logs/error.txt', 'a') as log:
         log.write(text)

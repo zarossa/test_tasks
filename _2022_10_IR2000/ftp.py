@@ -75,6 +75,32 @@ def ftp_list_of_new(server_files, table_name, region_name):
     return new_list_files
 
 
+def ftp_list_of_new_temp(server_files, table_name, region_name):
+    """Функция создания списка новых файлов
+    :param server_files: Файлы на сервере
+    :param table_name: Название SQL таблицы
+    :return: Возвращает список файлов для скачивания"""
+    oldest_archive = []
+    new_list_files = []
+    contract_numbers = get_contracts_numbers(table_name, region_name)  # те что на sql строчки
+    for contract in contract_numbers:
+        try:
+            tmp = contract_numbers[contract]['Название_архива'].split('/')[-1]
+            if tmp in oldest_archive:
+                continue
+            oldest_archive.append(tmp)  # список sql отработанных архивов
+        except Exception as e:
+            print(f'{e}\n{contract_numbers[contract]}')
+            continue
+    print(len(oldest_archive))
+    print(oldest_archive)
+    for idx, archive in enumerate(server_files):  # Пройтись по всем файлам с госзакупок
+        tmp_file = archive.replace('prevMonth/', '').replace('currMonth/', '')  #
+        if tmp_file not in oldest_archive and tmp_file not in new_list_files:
+            new_list_files.append(archive)
+    return new_list_files
+
+
 def ftp_download(ftp, file, path_tmp=direction + 'tmp/'):
     """Функция скачивания файла с FTP
     :param ftp: FTP-соединение
