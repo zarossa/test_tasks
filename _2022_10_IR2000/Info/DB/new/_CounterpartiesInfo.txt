@@ -1,0 +1,11 @@
+CounterpartiesInfo	Инфо_о_контрагентах_для_уплаты_неустоек
+
+'counterpartyInfo,payingPenaltiesInfo,regNum':	'Реестровый_номер',
+'counterpartyInfo,payingPenaltiesInfo,fullName':	'Полное_наименование',
+'counterpartyInfo,payingPenaltiesInfo,inn':	'ИНН',
+'counterpartyInfo,payingPenaltiesInfo,kpp':	'КПП',
+'counterpartyInfo,counterpartyAccountsDetails,counterpartyAccountDetails,personalAccountNumber':	'Реквизиты_Личный_счет',
+'counterpartyInfo,counterpartyAccountsDetails,counterpartyAccountDetails,creditOrgName':	'Реквизиты_Наименование_кредитной_организации',
+'counterpartyInfo,counterpartyAccountsDetails,counterpartyAccountDetails,bankAccountNumber':	'Реквизиты_Номер_счета',
+'counterpartyInfo,counterpartyAccountsDetails,counterpartyAccountDetails,bik':	'Реквизиты_БИК_банка',
+'counterpartyInfo,counterpartyAccountsDetails,counterpartyAccountDetails,corrAccountNumber':	'Реквизиты_Корр_счет'

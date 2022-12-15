@@ -1,0 +1,7 @@
+AccountDetails	Заказчик_Реквизиты_счета
+
+'personalAccountNumber':	'Личный_счет',
+'creditOrgName':	'Наименование_кредитной_организации',
+'bankAccountNumber':	'Номер_счета',
+'bik':	'БИК_банка',
+'corrAccountNumber':	'Корр_счет'

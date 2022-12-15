@@ -1,0 +1,20 @@
+Termination	Информация_о_расторжении_контракта
+
+'paid':	'Фактически_оплачено_Заказчиком_в_рублях',
+'terminationDate':	'Дата_расторжения_контракта',
+'reasonInfo':	'Причина_расторж_контракта_и_реквизиты_документа_основания',
+'reason,name':	'Основание_расторжения__контракта',
+'docTermination,code':	'Документ_основание_расторжения_контракта_Код',
+'docTermination,name':	'Документ_основание_расторжения_контракта',
+'docTermination,documentDate':	'Документ_основание_расторжения_контракта_Дата',
+'docTermination,documentNum':	'Документ_основание_расторжения_контракта_Номер',
+'decisionDate':	'Дата_уведомления_или_вступления_в_силу_судебного_решения',
+'reparations,reparation,foundationDoc,code':	'Код_документа_основания_для_начисления_суммы_возмещения',
+'reparations,reparation,foundationDoc,name':	'Наим_являющиегося_основания_для_начисления_суммы_возмещения',
+'reparations,reparation,payDoc,documentName':	'Наим_платежного_документа',
+'reparations,reparation,documentDate':	'Дата_документа',
+'reparations,reparation,documentNum':	'Номер_документа',
+'reparations,reparation,currency,name':	'Валюта_платежа',
+'reparations,reparation,sum':	'Сумма_возмещения_ущерба_в_валюте_платежа',
+'reparations,reparation,currencyRate,rate':	'Курс_валюты_на_дату_документа',
+'reparations,reparation,sumRUR':	'Сумма_возмещения_ущерба_в_рублевом_эквиваленте'

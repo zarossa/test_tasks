@@ -17,8 +17,7 @@ from data import direction
 инфой из циклов, так как вывод инфы в файл не понимает возврат коретки (\r)"""
 console_debug = 0
 
-all_data = {}  # Массив для записи данных
-all_long_data = {}
+all_data = data.all_data  # Массив для записи данных
 chank_size = 500  # Размера чанка
 number_try = 0
 
@@ -51,13 +50,11 @@ def archive_reading(archive_file, reg, table_name, len_list_files):
     arch_start = 1
     xml_start = 1
     global all_files
-    global all_long_data
     global false_files
     global true_files
     global error_files
     global all_data
     global chank
-    global chank_long
     global chank_size
     region_name = data.regions(reg)
     # print(f'read {archive_file}')
@@ -76,15 +73,39 @@ def archive_reading(archive_file, reg, table_name, len_list_files):
             try:
                 # Получаем содержимое файла в байтовом виде и отправляем в парсер на обработку
                 one_object = parser_xml.read_xml(f.read(arch_file), region_name, archive_file)
-                id_file = list(one_object.keys())[0]
-                # for i in one_object[id_file]:
-                #     len_files += len(one_object[id_file][i])
-                # if len_files < 8000:
-                all_data.update(one_object)
+                ID = one_object['id']
+                list_data = {
+                    'main': {ID: {}},
+                    'accountDetails': {},
+                    'attachments': {},
+                    'bankGuaranteePayment': {},
+                    'bankGuaranteeTermination': {},
+                    'counterpartiesInfo': {},
+                    'delayWriteOffPenalties': {},
+                    'enforcement': {},
+                    'executionObligationGuarantee': {},
+                    'executionPeriod': {},
+                    'executions': {},
+                    'finances': {},
+                    'finance_stages': {},
+                    'payments': {},
+                    'foundation': {},
+                    'holdCashEnforcement': {},
+                    'modification': {},
+                    'penalties': {},
+                    'products': {},
+                    'qualityGuaranteeInfo': {},
+                    'guaranteeReturns': {},
+                    'refundOverpaymentsInfo': {},
+                    'subContractorsSum': {},
+                    'suppliers': {},
+                    'termination': {}
+                }
+                parser_xml.xml_reader(list_data, one_object, data.links, ID, coord=ID)
+                for i in all_data:
+                    all_data[i].update(list_data[i])
+
                 chank += 1
-                # else:
-                #     all_long_data.update(one_object)
-                #     chank_long += 1
                 # if console_debug == 1:
                 # print('Parsing xml ' + str(round(
                 #     xml_start * (arch_start * 100 / len_list_files) / len(f.namelist()))) + '%',
@@ -92,13 +113,11 @@ def archive_reading(archive_file, reg, table_name, len_list_files):
                 xml_start += 1
 
                 if chank > chank_size - 1:
-                    sql.parse_sql(all_data, reg, region_name, table_name)
-                    all_data = {}
+                    for type_data in all_data:
+                        clear_data = sql.parse_sql(all_data[type_data], reg, region_name, table_name, type_data)
+                        if clear_data:
+                            all_data[clear_data] = {}
                     chank = 0
-                # if chank_long > 0:  #chank_size // 10 - 1:
-                #     sql.parse_sql(all_long_data, reg, region_name, table_name, True)
-                #     all_long_data = {}
-                #     chank_long = 0
             except Exception as error:
                 with open(direction + 'logs/error.txt', 'a') as log:
                     log.write(f'Ошибка чтения\n{archive_file}\n{arch_file}\n{error}\n\n')
@@ -187,13 +206,10 @@ try:
                 print('')  # Перенос строки после вывода процента скачаных архивов (не удалять, нужно)
 
             # Добавляем оставшиеся записи в БД после обработки региона
-            sql.parse_sql(all_data, region, region_name, table_name)
-            # sql.parse_sql(all_long_data, region, region_name, table_name, True)
-            all_data = {}
-            all_long_data = {}
-
+            for type_data in all_data:
+                sql.parse_sql(all_data[type_data], region, region_name, table_name, type_data, True)
+            all_data = data.all_data
             chank = 0
-            chank_long = 0
 
             # Получаем список файлов временной папки и удаляем их
             for file in os.listdir(direction + 'tmp'):
@@ -204,6 +220,7 @@ try:
             print(text)
             with open(direction + 'logs/log.txt', 'a') as reg:
                 reg.write(f'{text}\n')
+            break
         except IOError as ioe:
             text = f'Ошибка ввода/вывода!\n{ioe}'
             with open(direction + 'logs/log.txt', 'a') as reg:
@@ -212,6 +229,8 @@ try:
                 log.write(text)
             if ioe.errno == errno.EPIPE:
                 pass
+    text = f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")}'
+    print(text)
 
     text = 'Скрипт закончил работу\n'
     print(text)

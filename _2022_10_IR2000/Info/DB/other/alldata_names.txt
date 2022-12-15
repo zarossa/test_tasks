@@ -1,0 +1,71 @@
+'id', 'str', ID
+'placementDate', 'str', Дата первоначального размещения
+'publishDate', 'str', Дата публикации
+'versionNumber', 'str', Номер изменения
+'foundation', 'dict', Основание заключения контракта
+'customer', 'dict', Заказчик
+'placer', 'dict', Организация разместившая контракт
+'finances', 'dict', Финансирование
+'protocolDate', 'str', Дата подведения результатов определения поставщика
+'documentBase', 'str', Документ основание заключения контракта
+'documentCode', 'str', Код документа основания заключения контракта
+'signDate', 'str', Дата заключения контракта
+'regNum', 'str', Номер реестровой записи
+'number', 'str', Номер контракта
+'contractSubject', 'str', Предмет контракта
+'bankSupportContractRequiredInfo', 'dict', Инфо о банковском казначейском сопровождении контакта
+'treasurySupportContractSum', 'str', Сумма казначейского обеспечения обязательств
+'defenseContractNumber', 'str', Номер госконтракта по гособоронзаказу
+'IGK', 'str', Идентификатор госконтракта
+'priceInfo', 'dict', Информация о цене контракта
+'advancePaymentSum', 'dict', Предусмотрена выплата аванса
+'subContractorsSum', 'dict', Объем привлечения субподрядчиков
+'quantityContractStages', 'str', Количество этапов контракта
+'executionPeriod', 'dict', Срок исполнения контракта
+'enforcement', 'dict', Обеспечение исполнения контракта
+subsequentMaintenanceEnforcement
+'qualityGuaranteeInfo', 'dict', Информация о гарантии
+'guaranteeReturns', 'dict', Информация о возвращении независимой гарантии
+'deliveryPlaceInfo', 'dict', Место поставки товара
+'products', 'dict', Объекты закупки
+'suppliers', 'dict', Поставщики
+'counterpartiesInfo', 'dict', Информация о контрагентах
+'suppliersInfo', 'dict', Информация о поставщиках
+'href', 'str', Гиперссылка на публикацию сведений
+'printForm', 'dict', Печатная форма контракта
+extPrintForm
+'scanDocuments', 'dict', Отсканированная копия контракта
+'medicalDocuments', 'dict', Документы решения врачебной комиссии
+'singleSupplierP25Part1St93Documents', 'dict', Документы о согласовании контрольным органом заключения контракта с единственным поставщиком
+budgetObligations
+'attachments', 'dict', Информация о прикрепленных документах
+'modification', 'dict', Описание внесения изменений
+'currentContractStage', 'str', Текущее состояние контракта
+'okpd2okved2', 'str', Классификация по ОКПД2/ОКВЭД2
+schemeVersion
+'executions', 'dict', Информация об исполнении
+'executionObligationGuarantee', 'dict', Информация о наступлении гарантийного случая
+'termination', 'dict', Информация о расторжении контракта
+'refundOverpaymentsInfo', 'dict', Инфо о возврате переплаты по контракту
+contractInvalidation
+'bankGuaranteeTermination', 'list', Инфо о прекращении обязательств поставщика
+'penalties', 'dict', Информация о неустойках
+'delayWriteOffPenalties', 'dict', Инфо о предоставлении отсрочек уплаты неустойки
+'bankGuaranteePayment', 'dict', Инфо об уплате по независимой гарантии
+'holdCashEnforcement', 'dict', Сведения об удержании денежных средств
+'terminationDocuments', 'dict', Основание для расторжения контракта
+'paymentDocuments', 'dict', Документы подтверждающие исполнение
+'receiptDocuments', 'dict', Документы подтверждающие приемку товара
+'productOriginDocuments', 'dict', Информация о стране происхождения товара
+'examinationResultsDocuments', 'dict', Документ о результатах экспертизы поставленного товара
+'modificationReason', 'str', 'Исправление сведений'])
+
+
+
+
+
+subsequentMaintenanceEnforcement Обеспечение исполнения контракта по последующему обслуживанию
+extPrintForm Электронный документ, полученный из внешней системы
+budgetObligations Сведения о бюджетном обязательстве
+schemeVersion Версия схемы
+contractInvalidation Информация о признании контракта недействительным

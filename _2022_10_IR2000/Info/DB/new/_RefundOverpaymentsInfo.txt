@@ -1,0 +1,15 @@
+RefundOverpaymentsInfo	Инфо_о_возврате_переплаты_по_контракту
+
+'refundOverpaymentInfo,foundationRefundDocsInfo,foundationRefundDocInfo,name':	'Документ_основание_для_возврата_заказчику_переплаты_Название',
+'refundOverpaymentInfo,foundationRefundDocsInfo,foundationRefundDocInfo,number':	'Документ_основание_для_возврата_заказчику_переплаты_Номер',
+'refundOverpaymentInfo,foundationRefundDocsInfo,foundationRefundDocInfo,date':	'Документ_основание_для_возврата_заказчику_переплаты_Дата',
+'refundOverpaymentInfo,amountOverpaidsInfo,amountOverpaidInfo,amountOverpaidSum':	'Размер_переплаты_заказчиком_контракта_в_валюте',
+'refundOverpaymentInfo,amountOverpaidsInfo,amountOverpaidInfo,amountOverpaidSumRUR':	'Размер_переплаты_заказчиком_контракта_в_рублях',
+'refundOverpaymentInfo,amountOverpaidsInfo,amountOverpaidInfo,overpaidDate':	'Дата_возникновения_переплаты',
+'refundOverpaymentInfo,amountOverpaidsInfo,amountOverpaidInfo,currencyRate,rate':	'Курс_валюты_на_дату_переплаты',
+'refundOverpaymentInfo,amountRefundsInfo,amountRefundInfo,amountRefundSum':	'Размер_возврата_переплаты_заказчиком_контракта_в_валюте',
+'refundOverpaymentInfo,amountRefundsInfo,amountRefundInfo,amountRefundSumRUR':	'Размер_возврата_переплаты_заказчиком_контракта_в_рублях',
+'refundOverpaymentInfo,amountRefundsInfo,amountRefundInfo,refundDate':	'Дата_возврата_заказчику_переплаты_контракта',
+'refundOverpaymentInfo,amountRefundsInfo,amountRefundInfo,currencyRate,rate':	'Курс_валюты_на_дату_возврата',
+'currency,name':	'Валюта',
+'refundOverpaidDocuments,attachment':	'Документы_основание_для_возврата_переплаты_контракта'

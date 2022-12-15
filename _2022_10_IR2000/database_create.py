@@ -2,6 +2,7 @@ import mysql.connector as mysql
 from mysql.connector import Error
 from data import columns
 from data import config
+from data import ext_columns
 
 
 def db_connect():
@@ -50,19 +51,27 @@ try:
               'moscow_and_moscow_region',
               'crimean_fd']
     columns = ', '.join([f'ADD {i} MEDIUMTEXT' for i in columns if i not in (
-        'id', 'regNum', 'publish_date', 'Печатная_форма_кнтркта', 'Номер_кнтркта')])
+        'ID', 'Номер_реестровой_записи', 'Дата_публикации', 'Печатная_форма_контракта', 'Номер_контракта')])
     create_db()
     connection = db_connect()
     with connection.cursor() as cursor:
         for table in tables:
             create_table = f'''CREATE TABLE {table} (
                     true_id INTEGER PRIMARY KEY AUTO_INCREMENT,
-                    id INT,
-                    regNum BIGINT,
-                    publish_date TEXT,
-                    Печатная_форма_кнтркта TEXT,
-                    Номер_кнтркта TEXT
+                    ID INT,
+                    Номер_реестровой_записи BIGINT,
+                    Дата_публикации TEXT,
+                    Печатная_форма_контракта TEXT,
+                    Номер_контракта TEXT
                 ) ROW_FORMAT=DYNAMIC;'''
+            execute_query(create_table)
+            create_columns = f'ALTER TABLE {table} {columns}'
+            execute_query(create_columns)
+        for table in ext_columns:
+            create_table = f'''CREATE TABLE {table} (
+                    true_id INTEGER PRIMARY KEY AUTO_INCREMENT
+                ) ROW_FORMAT=DYNAMIC;'''
+            columns = ', '.join([f'ADD {i} MEDIUMTEXT' for i in ext_columns[table]])
             execute_query(create_table)
             create_columns = f'ALTER TABLE {table} {columns}'
             execute_query(create_columns)

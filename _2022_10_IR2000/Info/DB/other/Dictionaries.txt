@@ -1,0 +1,30 @@
+Dictionaries
+
+'foundation', 'dict', Основание заключения контракта
+'finances', 'dict', Финансирование
+'bankSupportContractRequiredInfo', 'dict', Инфо о банковском казначейском сопровождении контакта
+'advancePaymentSum', 'dict', Предусмотрена выплата аванса
+'subContractorsSum', 'dict', Объем привлечения субподрядчиков
+'executionPeriod', 'dict', Срок исполнения контракта
+'enforcement', 'dict', Обеспечение исполнения контракта
+'qualityGuaranteeInfo', 'dict', Информация о гарантии
+'guaranteeReturns', 'dict', Информация о возвращении независимой гарантии
+'deliveryPlaceInfo', 'dict', Место поставки товара
+'products', 'dict', Объекты закупки
+'suppliers', 'dict', Поставщики
+'counterpartiesInfo', 'dict', Информация о контрагентах
+'suppliersInfo', 'dict', Информация о поставщиках
+'modification', 'dict', Описание внесения изменений
+'executions', 'dict', Информация об исполнении
+'executionObligationGuarantee', 'dict', Информация о наступлении гарантийного случая
+'termination', 'dict', Информация о расторжении контракта
+'refundOverpaymentsInfo', 'dict', Инфо о возврате переплаты по контракту
+'bankGuaranteeTermination', 'list', Инфо о прекращении обязательств поставщика
+'penalties', 'dict', Информация о неустойках
+'delayWriteOffPenalties', 'dict', Инфо о предоставлении отсрочек уплаты неустойки
+'bankGuaranteePayment', 'dict', Инфо об уплате по независимой гарантии
+'holdCashEnforcement', 'dict', Сведения об удержании денежных средств
+
+
+
+

@@ -1,0 +1,58 @@
+Attachments
+
+Название
+Номер
+Код
+Описание
+Дата
+Ссылка
+
+	Attachments
+	fileName	Название
+	docDescription	Описание
+	url	Ссылка
+
+	Documents
+	documentName	Название
+	documentNum	Номер
+	documentDate	Дата
+	
+	documents
+	code	Код
+	name	Название
+	base	Номер
+	documentDate	Дата
+
+
+'scanDocuments', 'dict', Отсканированная копия контракта
+'medicalDocuments', 'dict', Документы решения врачебной комиссии
+'singleSupplierP25Part1St93Documents', 'dict', Документы о согласовании контрольным органом заключения контракта с единственным поставщиком
+'attachments', 'dict', Информация о прикрепленных документах
+'terminationDocuments', 'dict', Основание для расторжения контракта
+'paymentDocuments', 'dict', Документы подтверждающие исполнение
+'receiptDocuments', 'dict', Документы подтверждающие приемку товара
+'productOriginDocuments', 'dict', Информация о стране происхождения товара
+'examinationResultsDocuments', 'dict', Документ о результатах экспертизы поставленного товара
+'modification', 'dict', Описание внесения изменений
+'refundOverpaymentsInfo', 'dict', Инфо о возврате переплаты по контракту
+
+
+'foundation', 'dict', Основание заключения контракта
+'finances', 'dict', Финансирование
+'executionPeriod', 'dict', Срок исполнения контракта
+'enforcement', 'dict', Обеспечение исполнения контракта
+'qualityGuaranteeInfo', 'dict', Информация о гарантии
+'guaranteeReturns', 'dict', Информация о возвращении независимой гарантии
+'deliveryPlaceInfo', 'dict', Место поставки товара
+'products', 'dict', Объекты закупки
+'suppliers', 'dict', Поставщики
+'counterpartiesInfo', 'dict', Информация о контрагентах
+'suppliersInfo', 'dict', Информация о поставщиках
+'executions', 'dict', Информация об исполнении
+'executionObligationGuarantee', 'dict', Информация о наступлении гарантийного случая
+'termination', 'dict', Информация о расторжении контракта
+'bankGuaranteeTermination', 'list', Инфо о прекращении обязательств поставщика
+'penalties', 'dict', Информация о неустойках
+'delayWriteOffPenalties', 'dict', Инфо о предоставлении отсрочек уплаты неустойки
+'bankGuaranteePayment', 'dict', Инфо об уплате по независимой гарантии
+'holdCashEnforcement', 'dict', Сведения об удержании денежных средств

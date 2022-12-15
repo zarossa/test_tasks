@@ -1,0 +1,11 @@
+Attachments	Приложения
+
+'attachments,fileName':	'Название',
+'attachments,docDescription':	'Описание',
+'attachments,url':	'Ссылка',
+'documents,documentName':	'Название',
+'documents,documentNum':	'Номер',
+'documents,documentDate':	'Дата',
+'documents,code':	'Код',
+'documents,name':	'Название',
+'documents,base':	'Номер'

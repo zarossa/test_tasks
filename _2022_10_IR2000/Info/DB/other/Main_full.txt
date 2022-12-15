@@ -1,0 +1,136 @@
+Main
+
+['id']	ID
+['externalId']	Внешнее_ID
+['placementDate']	Дата_первоначального_размещения
+['publishDate']	Дата_публикации
+['versionNumber']	Номер_изменения
+['customer']	Заказчик
+	['customer']['regNum']	Заказчик_Реестровый_номер
+	['customer']['consRegistryNum']	Заказчик_Код_по_Сводному_Реестру
+	['customer']['fullName']	Заказчик_Полное_наименование
+	['customer']['shortName']	Заказчик_Сокращенное_наименование
+	['customer']['registrationDate']	Заказчик_Дата_постановки_на_учет_в_налоговом_органе
+	['customer']['inn']	Заказчик_ИНН
+	['customer']['kpp']	Заказчик_КПП
+	['customer']['legalForm']	Организационно_правовая_форма_в_ОКОПФ
+	['customer']['singularName']	Заказчик_Организационно_правовая_форма_в_ОКОПФ
+	['customer']['OKPO']	Заказчик_Код_по_ОКПО
+	['customer']['customerCode']	Идентификационный_код_заказчика
+	['customer']['customerAccountsDetails']['customerAccountDetails']	Реквизиты_счета_заказчика
+['placer']	dict	Организация_разместившая_контракт
+	['placer']['responsibleOrg']['regNum']	Организация_разместившая_контракт_Код_по_СПЗ
+	['placer']['responsibleOrg']['consRegistryNum']	Организация_разместившая_контракт_Код_по_Сводному_Реестру
+	['placer']['responsibleOrg']['fullName']	Организация_разместившая_контракт_Полное_наименование
+	['placer']['responsibleRole']	Роль_организации_разместившей_контракт
+	['placer']['placerChange']	Смена_размещающей_организации
+['foundation']	dict	Основание_заключения_контракта
+	['foundation']__Foundation	Основание_заключения_контракта
+['finances']	dict	Финансирование
+	['finances']__Finances	Финансирование
+['protocolDate']	Дата_подведения_рез_ов_определения_поставщика
+['documentBase']	Документ_основание_заключения_контракта
+['documentCode']	Код_документа_основания_заключения_контракта
+['signDate']	Дата_заключения_контракта
+['regNum']	Номер_реестровой_записи
+['number']	Номер_контракта
+['contractSubject']	Предмет_контракта
+['treasurySupportContractSum']	Сумма_казначейского_обеспечения_обязательств
+['defenseContractNumber']	Номер_госконтракта_по_гособоронзаказу
+['IGK']	Идентификатор_госконтракта
+['priceInfo']	dict	Информация_о_цене_контракта
+	['priceInfo']['price']	Инфо_о_цене_Значение_цены_контракта_в_валюте_контракта
+	['priceInfo']['priceType']	Инфо_о_цене_Способ_указания_цены_контракта
+	['priceInfo']['priceFormula']	Инфо_о_цене_Формула_указания_цены_контракта
+	['priceInfo']['maxPriceAndPriceFormulaSpecified']	Инфо_о_цене_Указана_макс_цена_и_формула_цены_контракта
+	['priceInfo']['currency']['name']	Инфо_о_цене_Валюта_контракта
+	['priceInfo']['currencyRate']['rate']	Инфо_о_цене_Курс_валюты_по_отношению_к_рублю
+	['priceInfo']['priceRUR']	Инфо_о_цене_Цена_контракта_в_рублевом_эквиваленте
+	['priceInfo']['priceVAT']	Инфо_о_цене_Значение_НДС_в_валюте_контракта
+	['priceInfo']['priceVATRUR']	Инфо_о_цене_Значение_НДС_в_рублевом_эквиваленте
+	['priceInfo']['amountsReducedByTaxes']	Инфо_о_цене_Суммы_уплачиваемые_заказчиком_поставщику
+	['priceInfo']['isWithHoldingUnfulfilledClaimsPenalties']	Инфо_о_цене_Предусмотр_удерж_суммы_неисполн_требований
+['advancePaymentSum']	dict	Предусмотрена_выплата_аванса
+	['advancePaymentSum']['sumInPercents']	Размер_аванса_в_процентах
+	['advancePaymentSum']['priceValue']	Размер_аванса_в_валюте_контракта
+	['advancePaymentSum']['priceValueRUR']	Размер_аванса_в_рублевом_эквиваленте
+['subContractorsSum']	dict	Объем_привлечения_субподрядчиков
+	['subContractorsSum']__SubContractorsSum	Объем_привлечения_субподрядчиков
+['quantityContractStages']	Количество_этапов_контракта
+['executionPeriod']	dict	Срок_исполнения_контракта
+	['executionPeriod']['startDate']	Дата_начала_исполнения_контракта
+	['executionPeriod']['stages']['sid']	Уникальный_идентификатор_этапа_контракта_в_ЕИС
+	['executionPeriod']['stages']['externalSid']	Внешний_идентификатор_этапа
+	['executionPeriod']['stages']['guid']	GUID_этапа_контракта
+	['executionPeriod']['stages']['startDate']	Дата_начала_исполнения_этапа
+	['executionPeriod']['stages']['endDate']	Дата_окончания_исполнения_этапа
+	['executionPeriod']['stages']['stagePrice']	Цена_этапа_контракта_в_валюте_контракта
+	['executionPeriod']['stages']['stagePriceRUR']	Цена_этапа_контракта_в_российских_рублях
+	['executionPeriod']['stages']['stageAdvancePaymentSum']['sumInPercents']	Размер_аванса_по_этапу_в_процентах
+	['executionPeriod']['stages']['stageAdvancePaymentSum']['priceValue']	Размер_аванса_по_этапу_в_валюте_контракта
+	['executionPeriod']['stages']['stageAdvancePaymentSum']['priceValueRUR']	Размер_аванса_по_этапу_в_рублевом_эквиваленте
+	['executionPeriod']['endDate']	Дата_окончания_исполнения_контракта
+['enforcement']	dict	Обеспечение_исполнения_контракта
+	['enforcement']__Enforcement	Обеспечение_исполнения_контракта
+['qualityGuaranteeInfo']	dict	Информация_о_гарантии
+	['qualityGuaranteeInfo']__QualityGuaranteeInfo	Информация_о_гарантии
+['deliveryPlaceInfo']	dict	Место_поставки_товара
+	['deliveryPlaceInfo']['byKLADRInfo']['KLADRInfo']['kladrCode']	Место_поставки_товара_КЛАДР_код
+	['deliveryPlaceInfo']['byKLADRInfo']['KLADRInfo']['fullName']	Место_поставки_товара_КЛАДР_название
+	['deliveryPlaceInfo']['byKLADRInfo']['deliveryPlace']	Место_поставки_товара_Адрес
+['products']	dict	Объекты_закупки
+	['products']['product']__Products	Объекты_закупки
+	['products']['parentProduct']__Products	Объекты_закупки_Родительский_предмет
+	['products']['quantityUndefined']	Объекты_закупки_Невозможно_указать_сведения_о_количестве
+	['products']['productsChange']['documents']__Attachments	Объекты_закупки_Изменения_Документ
+	['products']['productsChange']['changeInfo']	Объекты_закупки_Информация_об_изменении
+['suppliers']	dict	Поставщики
+	['suppliers']['supplier']__Suppliers	Поставщик
+['counterpartiesInfo']	dict	Инфо_о_контрагентах_для_уплаты_неустоек
+	['counterpartiesInfo']__CounterpartiesInfo	Инфо_о_контрагентах_для_уплаты_неустоек
+['suppliersInfo']	dict	Информация_о_поставщиках
+	['suppliersInfo']['supplierInfo']__SuppliersInfo	Информация_о_поставщике
+['href']	Гиперссылка_на_публикацию_сведений
+['printForm']	dict	Печатная_форма_контракта
+	['printForm']['url']	Печатная_форма_контракта
+['scanDocuments']	dict	Отсканированная_копия_контракта
+	['scanDocuments']['attachments']__Attachments	Отсканированная_копия_контракта
+['medicalDocuments']	dict	Документы_решения_врачебной_комиссии
+	['medicalDocuments']['attachments']__Attachments	Документы_решения_врачебной_комиссии
+['singleSupplierP25Part1St93Documents']	dict	Докы_о_соглас_контр_органом_заключ_ктракта_с_един_поставщ
+	['singleSupplierP25Part1St93Documents']['attachments']__Attachments	Докы_о_соглас_контр_органом_заключ_ктракта_с_един_поставщ
+['attachments']	dict	Информация_о_прикрепленных_документах
+	['attachments']['attachments']__Attachments	Прикрепленные_документы
+['modification']	dict	Описание_внесения_изменений
+	['modification']__Modification	Описание_внесения_изменений
+['currentContractStage']	Текущее_состояние_контракта
+['okpd2okved2']	Классификация_по_ОКПД2_ОКВЭД2
+['executions']	dict	Информация_об_исполнении
+	['executions']__Executions	Информация_об_исполнении
+['executionObligationGuarantee']	dict	Информация_о_наступлении_гарантийного_случая
+	['executionObligationGuarantee']__ExecutionObligationGuarantee	Информация_о_наступлении_гарантийного_случая
+['termination']	dict	Информация_о_расторжении_контракта
+	['termination']__Termination	Информация_о_расторжении_контракта
+['refundOverpaymentsInfo']	dict	Инфо_о_возврате_переплаты_по_контракту
+	['refundOverpaymentsInfo']__RefundOverpaymentsInfo	Инфо_о_возврате_переплаты_по_контракту
+['bankGuaranteeTermination']	['list']	Инфо_о_прекращении_обязательств_поставщика
+	['bankGuaranteeTermination']__BankGuaranteeTermination	Инфо_о_прекращении_обязательств_поставщика
+['penalties']	dict	Информация_о_неустойках
+	['penalties']__Penalties	Информация_о_неустойках
+['delayWriteOffPenalties']	dict	Инфо_о_предоставлении_отсрочек_уплаты_неустойки
+	['delayWriteOffPenalties']__DelayWriteOffPenalties	Инфо_о_предоставлении_отсрочек_уплаты_неустойки
+['bankGuaranteePayment']	dict	Инфо_об_уплате_по_независимой_гарантии
+	['bankGuaranteePayment']__BankGuaranteePayment	Инфо_об_уплате_по_независимой_гарантии
+['holdCashEnforcement']	dict	Сведения_об_удержании_денежных_средств
+	['holdCashEnforcement']__HoldCashEnforcement	Сведения_об_удержании_денежных_средств
+['terminationDocuments']	dict	Основание_для_расторжения_контракта
+	['terminationDocuments']['attachments']__Attachments	Основание_для_расторжения_контракта
+['paymentDocuments']	dict	Документы_подтверждающие_исполнение
+	['paymentDocuments']['attachments']__Attachments	Документы_подтверждающие_исполнение
+['receiptDocuments']	dict	Документы_подтверждающие_приемку_товара
+	['receiptDocuments']['attachments']__Attachments	Документы_подтверждающие_приемку_товара
+['productOriginDocuments']	dict	Информация_о_стране_происхождения_товара
+	['productOriginDocuments']['attachments']__Attachments	Информация_о_стране_происхождения_товара
+['examinationResultsDocuments']	dict	Документ_о_результатах_экспертизы_поставленного_товара
+	['examinationResultsDocuments']['attachments']__Attachments	Документ_о_результатах_экспертизы_поставленного_товара
+['modificationReason']	Исправление_сведений

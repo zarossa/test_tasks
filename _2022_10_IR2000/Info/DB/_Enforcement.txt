@@ -1,0 +1,14 @@
+Enforcement	Обеспечение_исполнения_контракта
+
+'bankGuarantee,regNumber':	'Номер_реестровой_записи_независ_гарант',
+'bankGuarantee,regNumberNotPublishedOnEIS':	'Инфо_о_номере_реестровой_записи_независ_гарант_не_размещена',
+'bankGuarantee,docNumber':	'Номер_документа_реестровой_записи_независ_гарант',
+'bankGuarantee,docNumberNotPublishedOnEIS':	'Инфо_о_номере_документа_реестровой_записи_не_размещена',
+'bankGuarantee,currency,name':	'Валюта_независ_гарант',
+'bankGuarantee,guaranteeAmount':	'Сумма_независ_гарант',
+'bankGuarantee,currencyRate,rate':	'Курс_валюты_на_дату_заключения_контракта',
+'bankGuarantee,guaranteeAmountRUR':	'Сумма_независ_гарант_в_рубл_экв',
+'cashAccount,currency,name':	'Валюта_обеспечения_исполнения_контракта',
+'cashAccount,amount':	'Размер_обеспечения_исполнения_контракта_в_валюте_обеспечения',
+'cashAccount,currencyRate,rate':	'Курс_валюты_на_дату_выдачи_обеспечения',
+'cashAccount,amountRUR':	'Размер_обеспечения_исполнения_контракта_в_рубл_экв'

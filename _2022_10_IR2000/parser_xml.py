@@ -1,5 +1,8 @@
 import xml.etree.ElementTree as ET
 import re
+from data import link_place
+from data import direction
+
 
 
 def etree_to_json(etree_data):
@@ -130,6 +133,83 @@ def get_field(parent_element, parent_name='', parent_type=False):
     return result
 
 
+def go_deeper(dictionary, search_word):
+    queue = list()
+    for child in dictionary:
+        if child == search_word:
+            return [child]
+        else:
+            queue.append([dictionary[child], [child]])
+    while queue:
+        vertex = queue.pop(0)
+        if type(vertex[0]) == str:
+            continue
+        if type(vertex[0]) == list:
+            continue
+        for child in vertex[0]:
+            if child == search_word:
+                return list(vertex[1]) + [child]
+            else:
+                queue.append([vertex[0][child], list(vertex[1]) + [child]])
+    return None
+
+
+def right_return(line, way):
+    if type(line) == list:
+        line = line[0]
+    try:
+        if len(way) > 1:
+            result = right_return(line[way[0]], way[1:])
+        else:
+            return line[way[0]]
+        return result
+    except KeyError:
+        return None
+    except TypeError:
+        pass
+    # except Exception as ex:
+    #     print('\n', ex)
+    #     print(way, line)
+
+
+def xml_reader(list_data, xml_file, link_names, id_obj, data_type='main', coord=''):
+    text = ''
+    for link in link_names:
+        try:
+            sep_link = link.split(',')
+            text = right_return(xml_file, sep_link)
+            if text is None:
+                continue
+            if type(text) == dict:
+                data_type_text = link_names[link][1]
+                coord_text = len(list_data[link_names[link][1]])
+                try:
+                    list_data[data_type][coord][link_names[link][0]] += f';:;_{data_type_text}_{id_obj}_{coord_text}'
+                except KeyError:
+                    list_data[data_type][coord][link_names[link][0]] = f'_{data_type_text}_{id_obj}_{coord_text}'
+                list_data[data_type_text][f'{id_obj}_{coord_text}'] = {}
+                xml_reader(list_data, text, link_place[data_type_text], id_obj, data_type_text, f'{id_obj}_{coord_text}')
+                pass
+            elif type(text) == list:
+                data_type_text = link_names[link][1]
+                for i in text:
+                    coord_text = len(list_data[link_names[link][1]])
+                    try:
+                        list_data[data_type][coord][link_names[link][0]] += f';:;_{data_type_text}_{id_obj}_{coord_text}'
+                    except KeyError:
+                        list_data[data_type][coord][link_names[link][0]] = f'_{data_type_text}_{id_obj}_{coord_text}'
+                    list_data[data_type_text][f'{id_obj}_{coord_text}'] = {}
+                    xml_reader(list_data, i, link_place[data_type_text], id_obj, data_type_text, f'{id_obj}_{coord_text}')
+                pass
+            else:
+                list_data[data_type][coord][link_names[link]] = text
+                pass
+        except KeyError as error:
+            with open(direction + 'logs/error.txt', 'a') as log:
+                log.write(f'Error in xml_reader\n{error}\n{data_type, link, text}\n\n')
+    return True
+
+
 def read_xml(xml_file, region_name, archive):
     """Функция чтения файла и первичной обработки перед парсером
     :param xml_file: xml-файл в байтовом виде
@@ -145,5 +225,5 @@ def read_xml(xml_file, region_name, archive):
     xml_object = ET.fromstring(xml_file)  # Преобразуем строку в объект
     xml_object = etree_to_dict(xml_object[0])  # Преобразуем обьект в словарь для более удобной работы
     xml_object['region'] = region_name
-    xml_object['archive_name'] = archive
-    return parse_xml(xml_object)
+    xml_object['archive_name'] = archive.split('/')[-1]
+    return xml_object

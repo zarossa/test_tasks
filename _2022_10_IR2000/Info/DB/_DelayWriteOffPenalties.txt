@@ -1,0 +1,20 @@
+DelayWriteOffPenalties	Инфо_о_предоставлении_отсрочек_уплаты_неустойки
+
+'totalAmount':	'Общая_сумма_неуплаченных_неустоек_в_рублях',
+'delayPenaltiesInProcent':	'Отношение_суммы_неуплач_неустоек_к_цене_контракта_в_проц',
+'delayPenalties,delayDate':	'Дата_предоставления_отсрочки_уплаты_неустойки',
+'delayPenalties,currency,name':	'Валюта_суммы_неустойки_по_которой_предоставлена_отсрочка',
+'delayPenalties,delayAmount':	'Сумма_неустойки_по_которой_предоставлена_отсрочка',
+'delayPenalties,currencyRate,rate':	'Курс_валюты_на_дату_предоставления_отсрочки',
+'delayPenalties,delayAmountRUR':	'Сумма_неустойки_по_которой_предоставлена_отсрочка_в_рубл_экв',
+'delayPenalties,delayPeriod':	'Срок_отсрочки_уплаты_неустойки',
+'delayPenalties,noticeDetails,documentNum':	'Номер_док_направ_заказчиком_об_отсрочке_уплаты_неустойки',
+'delayPenalties,noticeDetails,documentDate':	'Дата_док_направ_заказчиком_об_отсрочке_уплаты_неустойки',
+'writeOffPenalties,writeOffPenaltyReasons,name':	'Основания_списания_неустойки',
+'writeOffPenalties,writeOffDate':	'Дата_осуществления_списания_начисленных_сумм_неустойки',
+'writeOffPenalties,currency,name':	'Валюта_суммы_неустойки_по_которой_осуществлено_списание',
+'writeOffPenalties,writeOffAmount':	'Сумма_неустойки_по_которой_осуществлено_списание',
+'writeOffPenalties,currencyRate,rate':	'Курс_валюты_на_дату_предоставления_отсрочки',
+'writeOffPenalties,writeOffAmountRUR':	'Сумма_неустойки_по_которой_осуществлено_списание_в_рубл_экв',
+'writeOffPenalties,noticeDetails,documentNum':	'Номер_документа_направ_заказчиком_о_списании_суммы_неустойки',
+'writeOffPenalties,noticeDetails,documentDate':	'Дата_документа_направ_заказчиком_о_списании_суммы_неустойки'

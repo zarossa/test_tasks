@@ -1,0 +1,14 @@
+QuaranteeReturns	Информация_о_возвращении_независимой_гарантии
+
+'guaranteeReturn,bankGuaranteeReturn,regNumber':	'Инфо_о_возвращ_заказчиком_гарантии_Номер_реестр_записи',
+'guaranteeReturn,bankGuaranteeReturn,docNumber':	'Инфо_о_возвращ_заказчиком_гарантии_Номер_док_реестр_записи',
+'guaranteeReturn,bankGuaranteeReturn,returnDate':	'Инфо_о_возвращ_заказчиком_гарантии_Дата_возвращения',
+'guaranteeReturn,bankGuaranteeReturn,returnReason':	'Инфо_о_возвращ_заказчиком_гарантии_Причина_возвращения',
+'guaranteeReturn,bankGuaranteeReturn,returnPublishDate':	'Инфо_о_возвращ_заказчиком_гарантии_Дата_публикации_инф',
+'guaranteeReturn,waiverNotice,regNumber':	'Инфо_об_уведомл_об_освобожд_Номер_реестр_записи',
+'guaranteeReturn,waiverNotice,docNumber':	'Инфо_об_уведомл_об_освобожд_Номер_док_реестр_записи',
+'guaranteeReturn,waiverNotice,noticeDate':	'Инфо_об_уведомл_об_освобожд_Дата_уведомления',
+'guaranteeReturn,waiverNotice,noticeNumber':	'Инфо_об_уведомл_об_освобожд_Номер_уведомления',
+'guaranteeReturn,waiverNotice,noticeReason':	'Инфо_об_уведомл_об_освобожд_Причина_направления_уведомления',
+'guaranteeReturn,waiverNotice,noticePublishDate':	'Инфо_об_уведомл_об_освобожд_Дата_публикации_уведомления',
+'guaranteeReturn,notPublishedOnEIS':	'Информация_не_будет_размещена_на_официальном_сайте'

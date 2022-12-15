@@ -1,0 +1,9 @@
+Modification	Описание_внесения_изменений
+
+'contractChange,reason,name':	'Причина',
+'contractChange,document':	'__AttachmentsДокумент_основание',
+'contractChange,damagePayments,document':	'Оплата_ущерба_Документ',
+'contractChange,damagePayments,currency':	'Оплата_ущерба_Валюта',
+'contractChange,damagePayments,amountRUR':	'Оплата_ущерба_Сумма',
+'errorCorrection,description':	'Корректировка_ошибок',
+'attachments']__Attachments	Документы_основания_изменения_контракта'
