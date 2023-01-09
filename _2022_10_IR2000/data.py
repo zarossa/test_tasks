@@ -188,20 +188,13 @@ crimean_fd = {'94', '91', '92'}                                                 
 all_regions = northwestern_fd | central_fd | volga_fd | southern_fd | north_caucasian_fd | ural_fd | siberian_fd | \
               far_eastern_fd | crimean_fd
 
-config = {
-        'user': 'root1',
-        'password': '94b10644b610480e9ef334779068602df3824b11fd7d3261',
-        'host': '134.0.115.33',
-        'database': 'full_contracts',
-        'raise_on_warnings': True
-    }       # Данные для подключения к БД
-# config = {
-#         'user': 'root',
-#         'password': 'root',
-#         'host': 'localhost',
-#         'database': 'full_contracts',
-#         'raise_on_warnings': True
-#     }       # Данные для подключения к БД
+ config = {
+         'user': 'root',
+         'password': 'root',
+         'host': 'localhost',
+         'database': 'full_contracts',
+         'raise_on_warnings': True
+ }       # Данные для подключения к БД
 field_links = {
     'id': 'id',
     'regNum': 'regNum',
